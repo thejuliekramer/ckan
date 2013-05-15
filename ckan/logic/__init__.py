@@ -435,6 +435,14 @@ def get_action(action):
                         context['__auth_audit'].pop()
                 except IndexError:
                     pass
+                # allow plugins to alter the data_dict/context before the action
+                for plugin in PluginImplementations(IActions):
+                    plugin.before_action(action_name, context, data_dict)
+                # call the action
+                result = _action(context, data_dict, **kw)
+                # allow plugins to alter the data_dict/context after the action
+                for plugin in PluginImplementations(IActions):
+                    plugin.after_action(action_name, context, data_dict)
                 return result
             return wrapped
 
