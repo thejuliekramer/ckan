@@ -349,6 +349,11 @@ def test_range_validator():
     converted_data, errors = validate(data, schema)
     assert errors == {'name': [u'Missing value'], 'email': [u'Please enter a number that is 10 or smaller']}, errors
 
+def test_missing_data_field_for_formencode_validator():
+    data = {'foo': u'bar'}
 
+    schema = {'foo': [not_empty], 'field_not_found_in_data': [validators.Email]
+    }
 
-
+    converted_data, errors = validate(data, schema)
+    assert errors == {'field_not_found_in_data': [u'Missing value']}

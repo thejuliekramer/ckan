@@ -5,6 +5,9 @@ import json
 from pylons import config
 
 from ckan.common import _
+import logging
+
+log = logging.getLogger(__name__)
 
 class Missing(object):
     def __unicode__(self):
@@ -158,21 +161,34 @@ def augment_data(data, schema):
     return new_data
 
 def convert(converter, key, converted_data, errors, context):
+    #TODO remove debug statement
+    log.debug('convert called, field to validate: {0}'.format(key))
 
     if inspect.isclass(converter) and issubclass(converter, fe.Validator):
         try:
-            value = converted_data.get(key)
+            value = converted_data.get(key, '')
+            log.debug('value: {0}'.format(value))
             value = converter().to_python(value, state=context)
         except fe.Invalid, e:
+
             errors[key].append(e.msg)
+        except Invalid, e:
+            #TODO remove debug message
+            log.debug('Data field not found: {0}'.format(key))
+            errors[key].append(e.error)
         return
 
     if isinstance(converter, fe.Validator):
         try:
-            value = converted_data.get(key)
+            value = converted_data.get(key, '')
+            log.debug('value: {0}'.format(value))
             value = converter.to_python(value, state=context)
         except fe.Invalid, e:
             errors[key].append(e.msg)
+        except Invalid, e:
+            #TODO remove debug message
+            log.debug('Data field not found: {0}'.format(key))
+            errors[key].append(e.error)
         return
 
     try:
@@ -222,6 +238,9 @@ def _remove_blank_keys(schema):
 def validate(data, schema, context=None):
     '''Validate an unflattened nested dict against a schema.'''
     context = context or {}
+
+    #TODO remove debug statement
+    log.debug('validate called\nData:{0}'.format(data))
 
     assert isinstance(data, dict)
 
