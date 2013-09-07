@@ -10,22 +10,32 @@ import logging
 log = logging.getLogger(__name__)
 
 class Missing(object):
+    msg = u'Missing value'
+
     def __unicode__(self):
-        raise Invalid(_('Missing value'))
+        raise Invalid(_(self.msg))
+
     def __str__(self):
-        raise Invalid(_('Missing value'))
+        raise Invalid(_(self.msg))
+
     def __int__(self):
-        raise Invalid(_('Missing value'))
+        raise Invalid(_(self.msg))
+
     def __complex__(self):
-        raise Invalid(_('Missing value'))
+        raise Invalid(_(self.msg))
+
     def __long__(self):
-        raise Invalid(_('Missing value'))
+        raise Invalid(_(self.msg))
+
     def __float__(self):
-        raise Invalid(_('Missing value'))
+        raise Invalid(_(self.msg))
+
     def __oct__(self):
-        raise Invalid(_('Missing value'))
+        raise Invalid(_(self.msg))
+
     def __hex__(self):
-        raise Invalid(_('Missing value'))
+        raise Invalid(_(self.msg))
+
     def __nonzero__(self):
         return False
 
@@ -164,34 +174,36 @@ def convert(converter, key, converted_data, errors, context):
     #TODO remove debug statement
     log.debug('convert called, field to validate: {0}'.format(key))
 
+    value = converted_data.get(key, '')
+
     if inspect.isclass(converter) and issubclass(converter, fe.Validator):
+        if value is missing:
+            #hack: formencode can't handle instances of the Missing class consistently, so go ahead and insert the
+            #missing classes' error message and move to the next validator
+            errors[key].append(value.msg)
+            return
         try:
-            value = converted_data.get(key, '')
             log.debug('value: {0}'.format(value))
             value = converter().to_python(value, state=context)
         except fe.Invalid, e:
-
             errors[key].append(e.msg)
-        except Invalid, e:
-            #TODO remove debug message
-            log.debug('Data field not found: {0}'.format(key))
-            errors[key].append(e.error)
         return
 
     if isinstance(converter, fe.Validator):
+        if value is missing:
+            #hack: formencode can't handle instances of the Missing class consistently, so go ahead and insert the
+            #missing classes' error message and move to the next validator
+            errors[key].append(value.msg)
+            return
+
         try:
-            value = converted_data.get(key, '')
             value = converter.to_python(value, state=context)
         except fe.Invalid, e:
             errors[key].append(e.msg)
-        except Invalid, e:
-            #TODO remove debug message
-            log.debug('Data field not found: {0}'.format(key))
-            errors[key].append(e.error)
         return
 
     try:
-        value = converter(converted_data.get(key))
+        value = converter(value)
         converted_data[key] = value
         return
     except TypeError, e:
