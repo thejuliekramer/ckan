@@ -18,6 +18,10 @@ from ckan.lib.navl.validators import (identity_converter,
 
 from formencode import validators
 
+import logging
+
+log = logging.getLogger(__name__)
+
 
 schema = {
     "__after": [identity_converter],
@@ -198,6 +202,24 @@ def test_default():
     assert converted_data == {('1',): 'default', ('0',): '0 value'}, converted_data
 
 
+def test_ignore_missing():
+    log.debug('Starting test_ignore_missing()')
+
+    schema = {
+        "__junk": [ignore],
+        "__extras": [ignore, default("weee")],
+        "0": [default("default")],
+        "1": [ignore_missing, default("default")],
+    }
+
+    converted_data, errors = validate_flattened(data, schema)
+
+    log.debug('converted_data: {0}'.format(converted_data))
+
+    assert not errors
+    assert converted_data == {('0',): '0 value'}, converted_data
+
+
 def test_flatten():
 
     data = {'extras': [{'key': 'genre', 'value': u'horror'},
@@ -357,3 +379,19 @@ def test_missing_data_field_for_formencode_validator():
 
     converted_data, errors = validate(data, schema)
     assert errors == {'field_not_found_in_data': [u'Missing value']}
+
+def test_missing_data_field_ignore_missing():
+    """
+    Verify that we ignore fields marked ignore_missing, even if they have
+    other validators associated with them.
+    """
+    data = {'foo': u'bar'}
+
+    schema = {'foo': [not_empty], 'field_not_found_in_data': [validators.Email, ignore_missing]
+    }
+
+    converted_data, errors = validate(data, schema)
+
+    log.debug('errors: {0}'.format(errors))
+
+    assert not errors

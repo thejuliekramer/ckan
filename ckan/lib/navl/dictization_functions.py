@@ -181,7 +181,6 @@ def convert(converter, key, converted_data, errors, context):
     if isinstance(converter, fe.Validator):
         try:
             value = converted_data.get(key, '')
-            log.debug('value: {0}'.format(value))
             value = converter.to_python(value, state=context)
         except fe.Invalid, e:
             errors[key].append(e.msg)
