@@ -395,3 +395,16 @@ def test_missing_data_field_ignore_missing():
     log.debug('errors: {0}'.format(errors))
 
     assert not errors
+
+def test_missing_object_has_no_attribute_strip():
+    data = {'foo':u'bar'}
+
+    schema = {'field_not_found_in_data': [validators.URL(max=350), ignore_missing]
+    }
+
+
+    converted_data, errors = validate(data, schema)
+
+    log.debug('errors: {0}'.format(errors))
+
+    assert not errors
