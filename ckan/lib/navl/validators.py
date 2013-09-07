@@ -22,14 +22,14 @@ def not_missing(key, data, errors, context):
 
     value = data.get(key)
     if isinstance(value, Missing):
-        errors[key].append(_('Missing value'))
+        errors[key]=[_('Missing value')]
         raise StopOnError
 
 def not_empty(key, data, errors, context):
 
     value = data.get(key)
     if not value or isinstance(value, Missing):
-        errors[key].append(_('Missing value'))
+        errors[key]=[_('Missing value')]
         raise StopOnError
 
 def if_empty_same_as(other_key):
@@ -49,7 +49,7 @@ def both_not_empty(other_key):
         other_value = data.get(key[:-1] + (other_key,))
         if (not value or isinstance(value, Missing) and
             not other_value or other_value is missing):
-            errors[key].append(_('Missing value'))
+            errors[key]=[_('Missing value')]
             raise StopOnError
 
     return callable
