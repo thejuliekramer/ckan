@@ -396,7 +396,7 @@ def test_missing_data_field_ignore_missing():
 
     assert not errors
 
-def test_missing_object_has_no_attribute_strip():
+def test_formencode_url_validator_handled():
     data = {'foo':u'bar'}
 
     schema = {'field_not_found_in_data': [validators.URL(max=350), ignore_missing]
@@ -408,3 +408,15 @@ def test_missing_object_has_no_attribute_strip():
     log.debug('errors: {0}'.format(errors))
 
     assert not errors
+
+def test_not_empty_handled_when_data_missing():
+    data = {}
+
+    schema = {'foo': [validators.Email, not_empty]
+    }
+
+    converted_data, errors = validate(data, schema)
+
+    log.debug('errors: {0}'.format(errors))
+
+    assert errors == {'foo':[u'Missing value']}
