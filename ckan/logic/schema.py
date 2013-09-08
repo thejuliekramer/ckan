@@ -386,7 +386,7 @@ def default_user_schema():
         'id': [ignore_missing, unicode],
         'name': [not_empty, name_validator, user_name_validator, unicode],
         'fullname': [ignore_missing, unicode],
-        'password': [user_password_validator, user_password_not_empty, ignore_missing, unicode],
+        'password': [user_password_validator, user_password_not_empty, unicode],
         'email': [not_empty, unicode],
         'about': [ignore_missing, user_about_validator, unicode],
         'created': [ignore],
