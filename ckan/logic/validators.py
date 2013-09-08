@@ -627,7 +627,8 @@ def user_password_not_empty(key, data, errors, context):
     if not ('password1',) in data and not ('password2',) in data:
         password = data.get(('password',),None)
         if not password:
-            errors[key].append(_('Missing value'))
+            errors[key]=[_('Missing value')]
+            raise StopOnError
 
 def user_about_validator(value,context):
     if 'http://' in value or 'https://' in value:
