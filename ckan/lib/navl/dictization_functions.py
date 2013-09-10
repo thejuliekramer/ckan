@@ -138,9 +138,17 @@ def augment_data(data, schema):
     new_data = copy.copy(data)
 
     ## fill junk and extras
-
+    #FIXME this part of the code is unclear, needs more unit tests and comments
     for key, value in new_data.items():
         if key in full_schema:
+            continue
+
+        #Hack: this part of the function moves things into __extras or __junk.
+        #if for any reason, the password1 / password2 fields don't both have
+        #validators assigned, they'll end up getting moved, which causes validation
+        #to fail. for these, we have a special case to keep them as their own key:value
+        #pairs and not move them.
+        if key in [('password1', ),('password2', ), ('password',)]:
             continue
 
         ## check if any thing naugthy is placed against subschemas
@@ -151,7 +159,9 @@ def augment_data(data, schema):
                 raise DataError('Only lists of dicts can be placed against '
                                 'subschema %s, not %s' % (key,type(data[key])))
 
-        if key[:-1] in key_combinations:
+        # This section appears to move data which does not have validators/converters assigned (is not in full_schema)
+        # to the '__extras' or '__junk' fields
+        if  key[:-1] in key_combinations:
             extras_key = key[:-1] + ('__extras',)
             extras = new_data.get(extras_key, {})
             extras[key[-1]] = value
@@ -171,9 +181,6 @@ def augment_data(data, schema):
     return new_data
 
 def convert(converter, key, converted_data, errors, context):
-    #TODO remove debug statement
-    log.debug('convert called, field to validate: {0}'.format(key))
-
     value = converted_data.get(key, '')
 
     if inspect.isclass(converter) and issubclass(converter, fe.Validator):

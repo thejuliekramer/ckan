@@ -118,7 +118,7 @@ def test_make_full_schema():
                                                               ('4', 1, '30')])
 
 
-def test_augment_junk_and_extras():
+def test_augment_data_basic():
 
     assert augment_data(data, schema) == {
          ('__junk',): {('4', 1, '30'): '30 value 1'},
@@ -137,7 +137,7 @@ def test_augment_junk_and_extras():
 
 def test_identity_validation():
 
-    
+
     converted_data, errors = validate_flattened(data, schema)
     print errors
     print converted_data
@@ -266,6 +266,25 @@ def test_flatten():
                                  ('url',): u'http://blahblahblah.mydomain'}, pformat(flatten_dict(data))
 
     assert data == unflatten(flatten_dict(data))
+
+def test_flatten_empty():
+
+    data = {}
+    flattened_data = flatten_dict(data)
+
+    assert flattened_data == {}
+
+    assert data == unflatten(flattened_data)
+
+def test_flatten_no_extra():
+
+    data = {'foo':'bar',
+            'foo2':'bar2'}
+    flattened_data = flatten_dict(data)
+
+    assert flattened_data == {('foo',): u'bar', ('foo2', ): u'bar2'}
+
+    assert data == unflatten(flattened_data)
 
 
 def test_simple():
@@ -397,9 +416,13 @@ def test_missing_data_field_ignore_missing():
     assert not errors
 
 def test_formencode_url_validator_handled():
+    """
+    There were some errors being raised when using the formencode library's URL validator. Verifying that said
+    validator no longer causes an error in CKAN
+    """
     data = {'foo':u'bar'}
 
-    schema = {'field_not_found_in_data': [validators.URL(max=350), ignore_missing]
+    schema = {'field_not_found_in_data': [validators.URL, ignore_missing]
     }
 
 
