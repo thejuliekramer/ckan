@@ -1,5 +1,6 @@
 from nose.tools import assert_equal
 
+import unittest
 import ckan
 from ckan.lib.navl.dictization_functions import validate
 import ckan.logic.schema
@@ -138,4 +139,23 @@ class TestTag:
             data, errors = validate(data_dict, schema, context)
             assert_equal(data['tags'], [{'name': u'tag name'}])
 
+class TestUser(unittest.TestCase):
+    """
+    Tests in this class are for the user schema as defined in schema.py
+    """
 
+    def testNewUserCreation(self):
+        """
+        Test new user creation. When password1 and password2 match, validation should pass
+        """
+        context = {'model': ckan.model,
+                   'session': ckan.model.Session}
+        data = {'name':'foo',
+                'email':'foo@foo.com',
+                'password1':'secret',
+                'password2':'secret'
+                }
+        schema = ckan.logic.schema.user_new_form_schema()
+
+        converted_data, errors = validate(data, schema, context)
+        self.assertEqual(errors, {})
