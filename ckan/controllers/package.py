@@ -652,9 +652,9 @@ class PackageController(base.BaseController):
                 except NotAuthorized:
                     abort(401, _('Unauthorized to update dataset'))
                 except NotFound:
-                    abort(404, _('The dataset {id} could not be found.'
-                                 ).format(id=id))
-                if not len(data_dict['resources']):
+                    abort(404,
+                      _('The dataset {id} could not be found.').format(id=id))
+                if str.lower(config.get('ckan.package.resource_required', 'true')) == 'true' and not len(data_dict['resources']):
                     # no data so keep on page
                     msg = _('You must add at least one data resource')
                     # On new templates do not use flash message
