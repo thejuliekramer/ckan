@@ -105,27 +105,29 @@ def extras_list_dictize(extras_list, context):
 def _unified_resource_format(format_):
     ''' Convert resource formats into a more uniform set.
     eg .json, json, JSON, text/json all converted to JSON.'''
-
-    format_clean = format_.lower().split('/')[-1].replace('.', '')
-    formats = {
-        'csv' : 'CSV',
-        'zip' : 'ZIP',
-        'pdf' : 'PDF',
-        'xls' : 'XLS',
-        'json' : 'JSON',
-        'kml' : 'KML',
-        'xml' : 'XML',
-        'shape' : 'SHAPE',
-        'rdf' : 'RDF',
-        'txt' : 'TXT',
-        'text' : 'TEXT',
-        'html' : 'HTML',
-    }
-    if format_clean in formats:
-        format_new = formats[format_clean]
-    else:
-        format_new = format_.lower()
-    return format_new
+    # DWC - 28 Jan 2014 -- disabling as this forced valid media / mime types into invalid strings!
+    #
+    # format_clean = format_.lower().split('/')[-1].replace('.', '')
+    # formats = {
+    #     'csv' : 'CSV',
+    #     'zip' : 'ZIP',
+    #     'pdf' : 'PDF',
+    #     'xls' : 'XLS',
+    #     'json' : 'JSON',
+    #     'kml' : 'KML',
+    #     'xml' : 'XML',
+    #     'shape' : 'SHAPE',
+    #     'rdf' : 'RDF',
+    #     'txt' : 'TXT',
+    #     'text' : 'TEXT',
+    #     'html' : 'HTML',
+    # }
+    # if format_clean in formats:
+    #     format_new = formats[format_clean]
+    # else:
+    #     format_new = format_.lower()
+    # return format_new
+    return format_
 
 def resource_dictize(res, context):
     resource = d.table_dictize(res, context)
