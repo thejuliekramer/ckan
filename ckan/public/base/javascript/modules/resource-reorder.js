@@ -5,7 +5,7 @@ this.ckan.module('resource-reorder', function($, _) {
     options: {
       id: false,
       i18n: {
-        label: _('Reorder resources'),
+        label: _('Reorder files'),
         save: _('Save order'),
         saving: _('Saving...'),
         cancel: _('Cancel')
