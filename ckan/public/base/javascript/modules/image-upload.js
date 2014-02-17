@@ -127,7 +127,6 @@ this.ckan.module('image-upload', function($, _) {
       if (state == this.state.blank) {
         this.button_upload
           .add(this.field_image)
-          .add(this.button_url)
           .add(this.input)
           .show();
       } else if (state == this.state.attached) {
