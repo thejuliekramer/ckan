@@ -20,6 +20,7 @@ __all__ = [
     'ITemplateHelpers',
     'IFacets',
     'IAuthenticator',
+    'IResourceUpload',
 ]
 
 from inspect import isclass
@@ -997,3 +998,12 @@ class IAuthenticator(Interface):
         '''called on abort.  This allows aborts due to authorization issues
         to be overriden'''
         return (status_code, detail, headers, comment)
+
+
+class IResourceUpload(Interface):
+
+    def after_upload(self, context, resource):
+        pass
+
+    def after_delete(self, context, resource):
+        pass
