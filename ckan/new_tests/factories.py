@@ -178,6 +178,41 @@ class Dataset(factory.Factory):
         return dataset_dict
 
 
+class Resource(factory.Factory):
+    '''A factory class for creating CKAN resources.'''
+
+    FACTORY_FOR = ckan.model.Resource
+
+    def _resource_url(n):
+        return 'http://www.exampleresource.net/{n}'.format(n=n)
+
+    def _resource_name(n):
+        return 'test-resource-{n}'.format(n=n)
+
+    url = factory.Sequence(_resource_url)
+    name = factory.Sequence(_resource_name)
+    description = "Just another test resource"
+    format_ = "CSV"
+
+    def _build(cls, target_class, *args, **kwargs):
+        raise NotImplementedError(".build() isn't supported in CKAN")
+
+    @classmethod
+    def _create(cls, target_class, *args, **kwargs):
+        if args:
+            assert False, "Positional args aren't supported, use keyword args."
+
+        if 'user' in kwargs:
+            user = kwargs.pop('user')
+            context = {'user': user['name']}
+        else:
+            context = {}
+
+        resource_dict = helpers.call_action('resource_create', context=context,
+                                            **kwargs)
+        return resource_dict
+
+
 class Group(factory.Factory):
     '''A factory class for creating CKAN groups.'''
 
