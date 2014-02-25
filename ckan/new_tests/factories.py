@@ -179,8 +179,24 @@ class Dataset(factory.Factory):
 
 
 class Resource(factory.Factory):
-    '''A factory class for creating CKAN resources.'''
+    '''A factory class for creating CKAN resources.
 
+    As an optional convenience you can pass a dataset dict (e.g. from the
+    Dataset factory above) instead of resource_create's package_id argument
+    and it will be converted to a package_id. The following are equivalent:
+
+        dataset = factories.Dataset()
+        resource = factories.Resource(package_id=dataset['id'])
+
+        dataset = factories.Dataset()
+        resource = factories.Resource(dataset=dataset)
+
+    If you just want a resource and don't care what dataset it belongs to,
+    you can create it using this one-liner:
+
+        resource = factories.Resource(dataset=factories.Dataset())
+
+    '''
     FACTORY_FOR = ckan.model.Resource
 
     def _resource_url(n):
@@ -207,6 +223,10 @@ class Resource(factory.Factory):
             context = {'user': user['name']}
         else:
             context = {}
+
+        if 'package_id' not in kwargs and 'dataset' in kwargs:
+            kwargs['package_id'] = kwargs['dataset']['id']
+            del kwargs['dataset']
 
         resource_dict = helpers.call_action('resource_create', context=context,
                                             **kwargs)
