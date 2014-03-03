@@ -1,8 +1,9 @@
 import logging
-
+from logging import getLogger
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 
+log = getLogger(__name__)
 
 def create_country_codes():
     '''Create country_codes vocab and tags, if they don't exist already.
@@ -89,7 +90,7 @@ class ExampleIDatasetFormPlugin(plugins.SingletonPlugin,
         # Add our custom_test metadata field to the schema, this one will use
         # convert_to_extras instead of convert_to_tags.
         schema.update({
-                'custom_text': [tk.get_validator('ignore_missing'),
+                'custom_text': [tk.get_validator('not_empty'),
                     tk.get_converter('convert_to_extras')]
                 })
         # Add our custom_resource_text metadata field to the schema
@@ -99,16 +100,19 @@ class ExampleIDatasetFormPlugin(plugins.SingletonPlugin,
         return schema
 
     def create_package_schema(self):
+        log.debug('create_package_schema')
         schema = super(ExampleIDatasetFormPlugin, self).create_package_schema()
         schema = self._modify_package_schema(schema)
         return schema
 
     def update_package_schema(self):
+        log.debug('update_package_schema')
         schema = super(ExampleIDatasetFormPlugin, self).update_package_schema()
         schema = self._modify_package_schema(schema)
         return schema
 
     def show_package_schema(self):
+        log.debug('show_package_schema')
         schema = super(ExampleIDatasetFormPlugin, self).show_package_schema()
 
         # Don't show vocab tags mixed in with normal 'free' tags
