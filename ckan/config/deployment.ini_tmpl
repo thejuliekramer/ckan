@@ -87,8 +87,8 @@ ckan.plugins = stats text_preview recline_preview
 
 
 ## Front-End Settings
-ckan.site_title = CKAN
-ckan.site_logo = /base/images/ckan-logo.png
+ckan.site_title = OKFN Data Packager
+ckan.site_logo = 
 ckan.site_description =
 ckan.favicon = /images/icons/ckan.ico
 ckan.gravatar_default = identicon
@@ -133,7 +133,7 @@ ckan.feeds.author_link =
 
 ## Activity Streams Settings
 
-#ckan.activity_streams_enabled = true
+ckan.activity_streams_enabled = false
 #ckan.activity_list_limit = 31
 #ckan.activity_streams_email_notifications = true
 # ckan.email_notifications_since = 2 days
