@@ -87,7 +87,7 @@ ckan.plugins = stats text_preview recline_preview
 
 
 ## Front-End Settings
-ckan.site_title = OKFN Data Packager
+ckan.site_title = Open Knowledge Data Packager
 ckan.site_logo = 
 ckan.site_description =
 ckan.favicon = /images/icons/ckan.ico
