@@ -1,8 +1,7 @@
 import logging
-
+from logging import getLogger
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
-
 
 def create_country_codes():
     '''Create country_codes vocab and tags, if they don't exist already.
@@ -89,7 +88,7 @@ class ExampleIDatasetFormPlugin(plugins.SingletonPlugin,
         # Add our custom_test metadata field to the schema, this one will use
         # convert_to_extras instead of convert_to_tags.
         schema.update({
-                'custom_text': [tk.get_validator('ignore_missing'),
+                'custom_text': [tk.get_validator('not_empty'),
                     tk.get_converter('convert_to_extras')]
                 })
         return schema
