@@ -18,6 +18,10 @@ from ckan.lib.navl.validators import (identity_converter,
 
 from formencode import validators
 
+import logging
+
+log = logging.getLogger(__name__)
+
 
 schema = {
     "__after": [identity_converter],
@@ -114,7 +118,7 @@ def test_make_full_schema():
                                                               ('4', 1, '30')])
 
 
-def test_augment_junk_and_extras():
+def test_augment_data_basic():
 
     assert augment_data(data, schema) == {
          ('__junk',): {('4', 1, '30'): '30 value 1'},
@@ -133,7 +137,7 @@ def test_augment_junk_and_extras():
 
 def test_identity_validation():
 
-    
+
     converted_data, errors = validate_flattened(data, schema)
     print errors
     print converted_data
@@ -197,6 +201,22 @@ def test_default():
     assert not errors
     assert converted_data == {('1',): 'default', ('0',): '0 value'}, converted_data
 
+def test_ignore_missing():
+    log.debug('Starting test_ignore_missing()')
+
+    schema = {
+        "__junk": [ignore],
+        "__extras": [ignore, default("weee")],
+        "0": [default("default")],
+        "1": [ignore_missing, default("default")],
+    }
+
+    converted_data, errors = validate_flattened(data, schema)
+
+    log.debug('converted_data: {0}'.format(converted_data))
+
+    assert not errors
+    assert converted_data == {('0',): '0 value'}, converted_data
 
 def test_flatten():
 
@@ -244,6 +264,25 @@ def test_flatten():
                                  ('url',): u'http://blahblahblah.mydomain'}, pformat(flatten_dict(data))
 
     assert data == unflatten(flatten_dict(data))
+
+def test_flatten_empty():
+
+    data = {}
+    flattened_data = flatten_dict(data)
+
+    assert flattened_data == {}
+
+    assert data == unflatten(flattened_data)
+
+def test_flatten_no_extra():
+
+    data = {'foo':'bar',
+            'foo2':'bar2'}
+    flattened_data = flatten_dict(data)
+
+    assert flattened_data == {('foo',): u'bar', ('foo2', ): u'bar2'}
+
+    assert data == unflatten(flattened_data)
 
 
 def test_simple():
@@ -349,6 +388,56 @@ def test_range_validator():
     converted_data, errors = validate(data, schema)
     assert errors == {'name': [u'Missing value'], 'email': [u'Please enter a number that is 10 or smaller']}, errors
 
+def test_missing_data_field_for_formencode_validator():
+    data = {'foo': u'bar'}
+
+    schema = {'foo': [not_empty], 'field_not_found_in_data': [validators.Email]
+    }
+
+    converted_data, errors = validate(data, schema)
+    assert errors == {'field_not_found_in_data': [u'Missing value']}
+
+def test_missing_data_field_ignore_missing():
+    """
+    Verify that we ignore fields marked ignore_missing, even if they have
+    other validators associated with them.
+    """
+    data = {'foo': u'bar'}
+
+    schema = {'foo': [not_empty], 'field_not_found_in_data': [validators.Email, ignore_missing]
+    }
+
+    converted_data, errors = validate(data, schema)
+
+    log.debug('errors: {0}'.format(errors))
+
+    assert not errors
+
+def test_formencode_url_validator_handled():
+    """
+    There were some errors being raised when using the formencode library's URL validator. Verifying that said
+    validator no longer causes an error in CKAN
+    """
+    data = {'foo':u'bar'}
+
+    schema = {'field_not_found_in_data': [validators.URL, ignore_missing]
+    }
 
 
+    converted_data, errors = validate(data, schema)
 
+    log.debug('errors: {0}'.format(errors))
+
+    assert not errors
+
+def test_not_empty_handled_when_data_missing():
+    data = {}
+
+    schema = {'foo': [validators.Email, not_empty]
+    }
+
+    converted_data, errors = validate(data, schema)
+
+    log.debug('errors: {0}'.format(errors))
+
+    assert errors == {'foo':[u'Missing value']}

@@ -14,6 +14,10 @@ import ckan.new_authz as new_authz
 
 from ckan.common import _
 
+import logging
+
+log = logging.getLogger(__name__)
+
 Invalid = df.Invalid
 StopOnError = df.StopOnError
 Missing = df.Missing
@@ -542,16 +546,18 @@ def user_name_validator(key, data, errors, context):
             # existing user's name to that name.
             errors[key].append(_('That login name is not available.'))
 
-def user_both_passwords_entered(key, data, errors, context):
+def user_both_passwords_entered(key, data, errors, context=None):
 
     password1 = data.get(('password1',),None)
     password2 = data.get(('password2',),None)
 
-    if password1 is None or password1 == '' or \
-       password2 is None or password2 == '':
-        errors[('password',)].append(_('Please enter both passwords'))
+    if not (password1 and password2):
+        if key in errors:
+            errors[key].append(_('Please enter both passwords'))
+        else:
+            errors[key] = [_('Please enter both passwords')]
 
-def user_password_validator(key, data, errors, context):
+def user_password_validator(key, data, errors, context=None):
     value = data[key]
 
     if isinstance(value, Missing):
@@ -563,27 +569,31 @@ def user_password_validator(key, data, errors, context):
     elif len(value) < 4:
         errors[('password',)].append(_('Your password must be 4 characters or longer'))
 
-def user_passwords_match(key, data, errors, context):
+def user_passwords_match(key, data, errors, context=None):
 
     password1 = data.get(('password1',),None)
     password2 = data.get(('password2',),None)
 
     if not password1 == password2:
-        errors[key].append(_('The passwords you entered do not match'))
+        if key in errors:
+            errors[key].append(_('The passwords you entered do not match'))
+        else:
+            errors[key] = [_('The passwords you entered do not match')]
     else:
         #Set correct password
         data[('password',)] = password1
 
-def user_password_not_empty(key, data, errors, context):
+def user_password_not_empty(key, data, errors, context=None):
     '''Only check if password is present if the user is created via action API.
        If not, user_both_passwords_entered will handle the validation'''
 
     if not ('password1',) in data and not ('password2',) in data:
         password = data.get(('password',),None)
         if not password:
-            errors[key].append(_('Missing value'))
+            errors[key]=[_('Missing value')]
+            raise StopOnError
 
-def user_about_validator(value,context):
+def user_about_validator(value,context=None):
     if 'http://' in value or 'https://' in value:
         raise Invalid(_('Edit not allowed as it looks like spam. Please avoid links in your description.'))
 
@@ -693,7 +703,6 @@ def role_exists(role, context):
 
 def datasets_with_no_organization_cannot_be_private(key, data, errors,
         context):
-
     dataset_id = data.get(('id',))
     owner_org = data.get(('owner_org',))
     private = data[key] is True
@@ -717,7 +726,6 @@ def datasets_with_no_organization_cannot_be_private(key, data, errors,
     if not check_passed:
         errors[key].append(
                 _("Datasets with no organization can't be private."))
-
 
 def list_of_strings(key, data, errors, context):
     value = data.get(key)
