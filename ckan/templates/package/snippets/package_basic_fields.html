@@ -80,6 +80,9 @@
         </select>
       </div>
     </div>
+  {# private datasets must have an org, so add the owner_org tag in to pass validation #}
+  {% elif data.owner_org %}
+    <input type="hidden" name="owner_org" value="{{ data.owner_org }}"/>
   {% endif %}
 
   {% if show_visibility_selector %}
