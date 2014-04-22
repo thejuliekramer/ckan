@@ -19,6 +19,7 @@
           {% block flash %}
             {% set flash_messages = h.flash.pop_messages() | list %}
             <div class="flash-messages">
+              Recently, you may have heard about a new internet security weakness, known as Heartbleed, which is impacting some websites. There is no indication that Heartbleed has been used against inventory.data.gov or that any personal information has ever been at risk. However, we are asking users to change their current password out of an abundance of caution to ensure the protection of your information.
               {% for message in flash_messages %}
                 <div class="alert fade in {{ message.category }}">
                   {{ h.literal(message) }}
