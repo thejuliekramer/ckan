@@ -201,7 +201,6 @@ def test_default():
     assert not errors
     assert converted_data == {('1',): 'default', ('0',): '0 value'}, converted_data
 
-
 def test_ignore_missing():
     log.debug('Starting test_ignore_missing()')
 
@@ -218,7 +217,6 @@ def test_ignore_missing():
 
     assert not errors
     assert converted_data == {('0',): '0 value'}, converted_data
-
 
 def test_flatten():
 
