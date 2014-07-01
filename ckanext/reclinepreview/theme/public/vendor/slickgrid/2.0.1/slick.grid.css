@@ -12,7 +12,7 @@ classes should alter those!
 }
 
 .slick-header-columns, .slick-headerrow-columns {
-  width: 999999px;
+  width: 999999px !important;
   position: relative;
   white-space: nowrap;
   cursor: default;
