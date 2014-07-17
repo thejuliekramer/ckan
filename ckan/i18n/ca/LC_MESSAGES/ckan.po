@@ -2348,9 +2348,9 @@ msgstr "Accediu a les dades del recurs a través d'una API web amb suport per a 
 #: ckan/templates/ajax_snippets/api_info.html:24
 msgid ""
 " Further information in the <a       "
-"href=\"http://docs.ckan.org/en/latest/datastore.html\" "
+"href=\"http://docs.ckan.org/en/ckan-2.2/datastore.html\" "
 "target=\"_blank\">main CKAN Data API and DataStore documentation</a>.</p> "
-msgstr " Més informació a la <a       href=\"http://docs.ckan.org/en/latest/datastore.html\" target=\"_blank\">documentació de la API de dades de CKAN </a>.</p> "
+msgstr " Més informació a la <a       href=\"http://docs.ckan.org/en/ckan-2.2/datastore.html\" target=\"_blank\">documentació de la API de dades de CKAN </a>.</p> "
 
 #: ckan/templates/ajax_snippets/api_info.html:33
 msgid "Endpoints"

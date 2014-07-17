@@ -2355,9 +2355,9 @@ msgstr "Acceso al recurso de datos mediante una API web con servicio de consulta
 #: ckan/templates/ajax_snippets/api_info.html:24
 msgid ""
 " Further information in the <a       "
-"href=\"http://docs.ckan.org/en/latest/datastore.html\" "
+"href=\"http://docs.ckan.org/en/ckan-2.2/datastore.html\" "
 "target=\"_blank\">main CKAN Data API and DataStore documentation</a>.</p> "
-msgstr "Más información en el <a href=\"http://docs.ckan.org/en/latest/datastore.html\" target=\"_blank\"> API de Datos principal de CKAN y en la documentación del DataStore</a>.</p>"
+msgstr "Más información en el <a href=\"http://docs.ckan.org/en/ckan-2.2/datastore.html\" target=\"_blank\"> API de Datos principal de CKAN y en la documentación del DataStore</a>.</p>"
 
 #: ckan/templates/ajax_snippets/api_info.html:33
 msgid "Endpoints"
