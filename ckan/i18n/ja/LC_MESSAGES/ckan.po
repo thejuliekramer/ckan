@@ -2339,9 +2339,9 @@ msgstr "パワフルなクエリサポートがあるweb APIを通してリソ�
 #: ckan/templates/ajax_snippets/api_info.html:24
 msgid ""
 " Further information in the <a       "
-"href=\"http://docs.ckan.org/en/latest/datastore.html\" "
+"href=\"http://docs.ckan.org/en/ckan-2.2/datastore.html\" "
 "target=\"_blank\">main CKAN Data API and DataStore documentation</a>.</p> "
-msgstr " より詳しい情報は <a       href=\"http://docs.ckan.org/en/latest/datastore.html\" target=\"_blank\">CKAN Data API and DataStore documentation</a>を参照してください。</p> "
+msgstr " より詳しい情報は <a       href=\"http://docs.ckan.org/en/ckan-2.2/datastore.html\" target=\"_blank\">CKAN Data API and DataStore documentation</a>を参照してください。</p> "
 
 #: ckan/templates/ajax_snippets/api_info.html:33
 msgid "Endpoints"

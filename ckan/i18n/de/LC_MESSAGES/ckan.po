@@ -2357,9 +2357,9 @@ msgstr "Zugriff auf Ressourcen per Web-Schnittstelle mit umfangreichen Suchmögl
 #: ckan/templates/ajax_snippets/api_info.html:24
 msgid ""
 " Further information in the <a       "
-"href=\"http://docs.ckan.org/en/latest/datastore.html\" "
+"href=\"http://docs.ckan.org/en/ckan-2.2/datastore.html\" "
 "target=\"_blank\">main CKAN Data API and DataStore documentation</a>.</p> "
-msgstr "Weitergehende Informationen sind in der <a href=\"http://docs.ckan.org/en/latest/datastore.html\" target=\"_blank\">CKAN Data API und DataStore Dokumentation</a>.</p>"
+msgstr "Weitergehende Informationen sind in der <a href=\"http://docs.ckan.org/en/ckan-2.2/datastore.html\" target=\"_blank\">CKAN Data API und DataStore Dokumentation</a>.</p>"
 
 #: ckan/templates/ajax_snippets/api_info.html:33
 msgid "Endpoints"

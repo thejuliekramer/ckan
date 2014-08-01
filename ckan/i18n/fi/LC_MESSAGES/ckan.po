@@ -2354,9 +2354,9 @@ msgstr "Sisällöt on saatavilla myös kyselyrajapinna (API) kautta"
 #: ckan/templates/ajax_snippets/api_info.html:24
 msgid ""
 " Further information in the <a       "
-"href=\"http://docs.ckan.org/en/latest/datastore.html\" "
+"href=\"http://docs.ckan.org/en/ckan-2.2/datastore.html\" "
 "target=\"_blank\">main CKAN Data API and DataStore documentation</a>.</p> "
-msgstr "Lisätietoja <a href=\"http://docs.ckan.org/en/latest/datastore.html\" target=\"_blank\">CKAN Data API:n ja DataStoren dokumentaatiossa</a>.</p> "
+msgstr "Lisätietoja <a href=\"http://docs.ckan.org/en/ckan-2.2/datastore.html\" target=\"_blank\">CKAN Data API:n ja DataStoren dokumentaatiossa</a>.</p> "
 
 #: ckan/templates/ajax_snippets/api_info.html:33
 msgid "Endpoints"

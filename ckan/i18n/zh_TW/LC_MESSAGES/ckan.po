@@ -2339,9 +2339,9 @@ msgstr "透過一擁有強大查詢功能支援的網路API來存取資源之資
 #: ckan/templates/ajax_snippets/api_info.html:24
 msgid ""
 " Further information in the <a       "
-"href=\"http://docs.ckan.org/en/latest/datastore.html\" "
+"href=\"http://docs.ckan.org/en/ckan-2.2/datastore.html\" "
 "target=\"_blank\">main CKAN Data API and DataStore documentation</a>.</p> "
-msgstr "更進一步的資訊在<a href=\"http://docs.ckan.org/en/latest/datastore.html\" target=\"_blank\">主要的CKAN資料API和資料儲存的文件中</a>。</p>"
+msgstr "更進一步的資訊在<a href=\"http://docs.ckan.org/en/ckan-2.2/datastore.html\" target=\"_blank\">主要的CKAN資料API和資料儲存的文件中</a>。</p>"
 
 #: ckan/templates/ajax_snippets/api_info.html:33
 msgid "Endpoints"
