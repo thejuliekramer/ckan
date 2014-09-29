@@ -7160,6 +7160,8 @@ h4 small {
   font-weight: 700;
   line-height: 36px;
   margin-left: 0;
+  word-break: break-word;
+  width: 200%;
 }
 .context-info .nums dl dd .smallest {
   font-size: 13px;
