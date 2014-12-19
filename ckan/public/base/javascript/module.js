@@ -1,4 +1,3 @@
-if(top != self) top.location.replace(location);
 this.ckan = this.ckan || {};
 
 /* The module system ties JavaScript code to elements on the page. A module is
