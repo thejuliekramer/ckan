@@ -3,10 +3,14 @@ import datetime
 
 import nose.tools
 import mock
+import pylons.config as config
 
 import ckan.logic as logic
 import ckan.new_tests.helpers as helpers
 import ckan.new_tests.factories as factories
+
+
+assert_raises = nose.tools.assert_raises
 
 
 def datetime_from_string(s):
@@ -83,14 +87,14 @@ class TestUpdate(object):
         user_dict = factories.User.attributes()
         user_dict['id'] = "there's no user with this id"
 
-        nose.tools.assert_raises(logic.NotFound, helpers.call_action,
-                                 'user_update', **user_dict)
+        assert_raises(logic.NotFound, helpers.call_action,
+                      'user_update', **user_dict)
 
     def test_user_update_with_no_id(self):
         user_dict = factories.User.attributes()
         assert 'id' not in user_dict
-        nose.tools.assert_raises(logic.ValidationError, helpers.call_action,
-                                 'user_update', **user_dict)
+        assert_raises(logic.ValidationError, helpers.call_action,
+                      'user_update', **user_dict)
 
     ## START-FOR-LOOP-EXAMPLE
 
@@ -98,12 +102,12 @@ class TestUpdate(object):
         user = factories.User()
 
         invalid_names = ('', 'a', False, 0, -1, 23, 'new', 'edit', 'search',
-                         'a'*200, 'Hi!', 'i++%')
+                         'a' * 200, 'Hi!', 'i++%')
         for name in invalid_names:
             user['name'] = name
-            nose.tools.assert_raises(logic.ValidationError,
-                                     helpers.call_action, 'user_update',
-                                     **user)
+            assert_raises(logic.ValidationError,
+                          helpers.call_action, 'user_update',
+                          **user)
 
     ## END-FOR-LOOP-EXAMPLE
 
@@ -114,8 +118,8 @@ class TestUpdate(object):
         # Try to update fred and change his user name to bob, which is already
         # bob's user name
         fred['name'] = bob['name']
-        nose.tools.assert_raises(logic.ValidationError, helpers.call_action,
-                                 'user_update', **fred)
+        assert_raises(logic.ValidationError, helpers.call_action,
+                      'user_update', **fred)
 
     def test_user_update_password(self):
         '''Test that updating a user's password works successfully.'''
@@ -139,8 +143,8 @@ class TestUpdate(object):
         user = factories.User()
 
         user['password'] = 'xxx'  # This password is too short.
-        nose.tools.assert_raises(logic.ValidationError, helpers.call_action,
-                                 'user_update', **user)
+        assert_raises(logic.ValidationError, helpers.call_action,
+                      'user_update', **user)
 
     def test_user_update_with_empty_password(self):
         '''If an empty password is passed to user_update, nothing should
@@ -165,17 +169,17 @@ class TestUpdate(object):
         user = factories.User()
 
         user['password'] = None
-        nose.tools.assert_raises(logic.ValidationError, helpers.call_action,
-                                 'user_update', **user)
+        assert_raises(logic.ValidationError, helpers.call_action,
+                      'user_update', **user)
 
     def test_user_update_with_invalid_password(self):
         user = factories.User()
 
         for password in (False, -1, 23, 30.7):
             user['password'] = password
-            nose.tools.assert_raises(logic.ValidationError,
-                                     helpers.call_action, 'user_update',
-                                     **user)
+            assert_raises(logic.ValidationError,
+                          helpers.call_action, 'user_update',
+                          **user)
 
     def test_user_update_without_email_address(self):
         '''You have to pass an email address when you call user_update.
@@ -193,9 +197,9 @@ class TestUpdate(object):
         user = factories.User()
         del user['email']
 
-        nose.tools.assert_raises(logic.ValidationError,
-                                 helpers.call_action, 'user_update',
-                                 **user)
+        assert_raises(logic.ValidationError,
+                      helpers.call_action, 'user_update',
+                      **user)
 
     # TODO: Valid and invalid values for the rest of the user model's fields.
 
@@ -385,3 +389,27 @@ class TestUpdate(object):
         assert reordered_resource_urls == ["http://b.html",
                                            "http://c.html",
                                            "http://a.html"]
+
+
+class TestUpdateSendEmailNotifications(object):
+    @classmethod
+    def setup_class(cls):
+        cls._original_config = dict(config)
+        config['ckan.activity_streams_email_notifications'] = True
+
+    @classmethod
+    def teardown_class(cls):
+        config.clear()
+        config.update(cls._original_config)
+
+    @mock.patch('ckan.logic.action.update.request')
+    def test_calling_through_paster_doesnt_validates_auth(self, mock_request):
+        mock_request.environ.get.return_value = True
+        helpers.call_action('send_email_notifications')
+
+    @mock.patch('ckan.logic.action.update.request')
+    def test_not_calling_through_paster_validates_auth(self, mock_request):
+        mock_request.environ.get.return_value = False
+        assert_raises(logic.NotAuthorized, helpers.call_action,
+                      'send_email_notifications',
+                      context={'ignore_auth': False})

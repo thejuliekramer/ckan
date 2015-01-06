@@ -529,7 +529,8 @@ def organization_list_for_user(context, data_dict):
         q = model.Session.query(model.Member) \
             .filter(model.Member.table_name == 'user') \
             .filter(model.Member.capacity.in_(roles)) \
-            .filter(model.Member.table_id == user_id)
+            .filter(model.Member.table_id == user_id) \
+            .filter(model.Member.state == 'active')
 
         group_ids = []
         for row in q.all():
@@ -1220,8 +1221,9 @@ def package_autocomplete(context, data_dict):
     like_q = u"%s%%" % q
 
     query = model.Session.query(model.PackageRevision)
-    query = query.filter(model.PackageRevision.state=='active')
-    query = query.filter(model.PackageRevision.current==True)
+    query = query.filter(model.PackageRevision.state == 'active')
+    query = query.filter(model.PackageRevision.private == False)
+    query = query.filter(model.PackageRevision.current == True)
     query = query.filter(_or_(model.PackageRevision.name.ilike(like_q),
                                 model.PackageRevision.title.ilike(like_q)))
     query = query.limit(limit)
@@ -1968,8 +1970,8 @@ def get_site_user(context, data_dict):
         user.sysadmin = True
         model.Session.add(user)
         model.Session.flush()
-    if not context.get('defer_commit'):
-        model.repo.commit_and_remove()
+        if not context.get('defer_commit'):
+            model.repo.commit()
 
     return {'name': user.name,
             'apikey': user.apikey}
@@ -2446,6 +2448,18 @@ def group_follower_count(context, data_dict):
             context['model'].UserFollowingGroup)
 
 
+def organization_follower_count(context, data_dict):
+    '''Return the number of followers of an organization.
+
+    :param id: the id or name of the organization
+    :type id: string
+
+    :rtype: int
+
+    '''
+    return group_follower_count(context, data_dict)
+
+
 def _follower_list(context, data_dict, default_schema, FollowerClass):
     schema = context.get('schema', default_schema)
     data_dict, errors = _validate(data_dict, schema, context)
@@ -2509,6 +2523,21 @@ def group_follower_list(context, data_dict):
             ckan.logic.schema.default_follow_group_schema(),
             context['model'].UserFollowingGroup)
 
+
+def organization_follower_list(context, data_dict):
+    '''Return the list of users that are following the given organization.
+
+    :param id: the id or name of the organization
+    :type id: string
+
+    :rtype: list of dictionaries
+
+    '''
+    _check_access('organization_follower_list', context, data_dict)
+    return _follower_list(
+        context, data_dict,
+        ckan.logic.schema.default_follow_group_schema(),
+        context['model'].UserFollowingGroup)
 
 def _am_following(context, data_dict, default_schema, FollowerClass):
     schema = context.get('schema', default_schema)
@@ -2690,13 +2719,14 @@ def followee_list(context, data_dict):
     for followee_list_function, followee_type in (
             (user_followee_list, 'user'),
             (dataset_followee_list, 'dataset'),
-            (group_followee_list, 'group')):
+            (group_followee_list, 'group'),
+            (organization_followee_list, 'organization')):
         dicts = followee_list_function(context, data_dict)
         for d in dicts:
             followee_dicts.append(
-                    {'type': followee_type,
-                    'display_name': display_name(d),
-                    'dict': d})
+                {'type': followee_type,
+                 'display_name': display_name(d),
+                 'dict': d})
 
     followee_dicts.sort(key=lambda d: d['display_name'])
 
@@ -2784,6 +2814,26 @@ def group_followee_list(context, data_dict):
     '''
     _check_access('group_followee_list', context, data_dict)
 
+    return _group_or_org_followee_list(context, data_dict, is_org=False)
+
+
+def organization_followee_list(context, data_dict):
+    '''Return the list of organizations that are followed by the given user.
+
+    :param id: the id or name of the user
+    :type id: string
+
+    :rtype: list of dictionaries
+
+    '''
+
+    _check_access('organization_followee_list', context, data_dict)
+
+    return _group_or_org_followee_list(context, data_dict, is_org=True)
+
+
+def _group_or_org_followee_list(context, data_dict, is_org=False):
+
     if not context.get('skip_validation'):
         schema = context.get('schema',
                 ckan.logic.schema.default_follow_user_schema())
@@ -2798,7 +2848,8 @@ def group_followee_list(context, data_dict):
 
     # Convert the UserFollowingGroup objects to a list of Group objects.
     groups = [model.Group.get(followee.object_id) for followee in followees]
-    groups = [group for group in groups if group is not None]
+    groups = [group for group in groups
+              if group is not None and group.is_organization == is_org]
 
     # Dictize the list of Group objects.
     return [model_dictize.group_dictize(group, context) for group in groups]

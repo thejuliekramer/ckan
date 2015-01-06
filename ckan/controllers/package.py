@@ -316,6 +316,8 @@ class PackageController(base.BaseController):
 
         try:
             check_access('package_update', context, data_dict)
+        except NotFound:
+            abort(404, _('Dataset not found'))
         except NotAuthorized, e:
             abort(401, _('User %r not authorized to edit %s') % (c.user, id))
         # check if package exists
@@ -705,6 +707,11 @@ class PackageController(base.BaseController):
             pkg_dict = get_action('package_show')(context, {'id': id})
         except NotFound:
             abort(404, _('The dataset {id} could not be found.').format(id=id))
+        try:
+            check_access('resource_create', context, pkg_dict)
+        except NotAuthorized:
+            abort(401, _('Unauthorized to create a resource for this package'))
+
         # required for nav menu
         vars['pkg_dict'] = pkg_dict
         template = 'package/new_resource_not_draft.html'
@@ -932,6 +939,8 @@ class PackageController(base.BaseController):
                     # This is actually an update not a save
                     data_dict['id'] = data_dict['pkg_name']
                     del data_dict['pkg_name']
+                    # don't change the dataset state
+                    data_dict['state'] = 'draft'
                     # this is actually an edit not a save
                     pkg_dict = get_action('package_update')(context, data_dict)
 
@@ -1237,7 +1246,8 @@ class PackageController(base.BaseController):
                abort(404, _('Resource data not found'))
             response.headers.update(dict(headers))
             content_type, content_enc = mimetypes.guess_type(rsc.get('url',''))
-            response.headers['Content-Type'] = content_type
+            if content_type:
+                response.headers['Content-Type'] = content_type
             response.status = status
             return app_iter
         elif not 'url' in rsc:

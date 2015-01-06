@@ -57,6 +57,7 @@ from ckan.logic.converters import (convert_user_name_or_id_to_id,
                                    convert_package_name_or_id_to_id,
                                    convert_group_name_or_id_to_id,
                                    convert_to_json_if_string,
+                                   remove_whitespace,
                                    )
 from formencode.validators import OneOf
 import ckan.model
@@ -69,7 +70,7 @@ def default_resource_schema():
         'revision_id': [ignore_missing, unicode],
         'resource_group_id': [ignore],
         'package_id': [ignore],
-        'url': [not_empty, unicode],#, URL(add_http=False)],
+        'url': [not_empty, unicode, remove_whitespace],
         'description': [ignore_missing, unicode],
         'format': [not_empty, unicode],
         'hash': [ignore_missing, unicode],

@@ -370,15 +370,19 @@ def group_dictize(group, context):
     else:
         q['fq'] = 'groups:"{0}"'.format(group.name)
 
-    is_group_member = (context.get('user') and
-         new_authz.has_user_permission_for_group_or_org(group.id, context.get('user'), 'read'))
-    if is_group_member:
-        context['ignore_capacity_check'] = True
+    # Allow members of organizations to see private datasets.
+    if group.is_organization:
+        is_group_member = (context.get('user') and
+            new_authz.has_user_permission_for_group_or_org(
+                group.id, context.get('user'), 'read'))
+        if is_group_member:
+            context['ignore_capacity_check'] = True
 
     if include_datasets:
         q['rows'] = 1000    # Only the first 1000 datasets are returned
 
-    search_results = logic.get_action('package_search')(context, q)
+    context_ = dict((k, v) for (k, v) in context.items() if k != 'schema')
+    search_results = logic.get_action('package_search')(context_, q)
 
     if include_datasets:
         result_dict['packages'] = search_results['results']

@@ -12,6 +12,7 @@ import re
 import urllib
 import pprint
 import copy
+import urlparse
 from urllib import urlencode
 
 from paste.deploy.converters import asbool
@@ -225,6 +226,18 @@ def _add_i18n_to_url(url_to_amend, **kw):
         raise ckan.exceptions.CkanUrlException(error)
 
     return url
+
+
+def url_is_local(url):
+    '''Returns True if url is local'''
+    if not url or url.startswith('//'):
+        return False
+    parsed = urlparse.urlparse(url)
+    if parsed.scheme:
+        domain = urlparse.urlparse(url_for('/', qualified=True)).netloc
+        if domain != parsed.netloc:
+            return False
+    return True
 
 
 def full_current_url():
@@ -530,7 +543,7 @@ def default_group_type():
     return str(config.get('ckan.default.group_type', 'group'))
 
 
-def get_facet_items_dict(facet, limit=10, exclude_active=False):
+def get_facet_items_dict(facet, limit=None, exclude_active=False):
     '''Return the list of unselected facet items for the given facet, sorted
     by count.
 
@@ -562,12 +575,42 @@ def get_facet_items_dict(facet, limit=10, exclude_active=False):
         elif not exclude_active:
             facets.append(dict(active=True, **facet_item))
     facets = sorted(facets, key=lambda item: item['count'], reverse=True)
-    if c.search_facets_limits:
+    if c.search_facets_limits and limit is None:
         limit = c.search_facets_limits.get(facet)
-    if limit:
+    # zero treated as infinite for hysterical raisins
+    if limit is not None and limit > 0:
         return facets[:limit]
-    else:
-        return facets
+    return facets
+
+
+def has_more_facets(facet, limit=None, exclude_active=False):
+    '''
+    Returns True if there are more facet items for the given facet than the
+    limit.
+
+    Reads the complete list of facet items for the given facet from
+    c.search_facets, and filters out the facet items that the user has already
+    selected.
+
+    Arguments:
+    facet -- the name of the facet to filter.
+    limit -- the max. number of facet items.
+    exclude_active -- only return unselected facets.
+
+    '''
+    facets = []
+    for facet_item in c.search_facets.get(facet)['items']:
+        if not len(facet_item['name'].strip()):
+            continue
+        if not (facet, facet_item['name']) in request.params.items():
+            facets.append(dict(active=False, **facet_item))
+        elif not exclude_active:
+            facets.append(dict(active=True, **facet_item))
+    if c.search_facets_limits and limit is None:
+        limit = c.search_facets_limits.get(facet)
+    if limit is not None and len(facets) > limit:
+        return True
+    return False
 
 
 def unselected_facet_items(facet, limit=10):
@@ -1413,7 +1456,8 @@ def dashboard_activity_stream(user_id, filter_type=None, filter_id=None,
         action_functions = {
             'dataset': 'package_activity_list_html',
             'user': 'user_activity_list_html',
-            'group': 'group_activity_list_html'
+            'group': 'group_activity_list_html',
+            'organization': 'organization_activity_list_html',
         }
         action_function = logic.get_action(action_functions.get(filter_type))
         return action_function(context, {'id': filter_id, 'offset': offset})
@@ -1750,6 +1794,15 @@ def get_site_statistics():
 def check_config_permission(permission):
     return new_authz.check_config_permission(permission)
 
+
+def get_organization(org=None, include_datasets=False):
+    if org is None:
+        return {}
+    try:
+        return logic.get_action('organization_show')({}, {'id': org, 'include_datasets': include_datasets})
+    except (NotFound, ValidationError, NotAuthorized):
+        return {}
+
 # these are the functions that will end up in `h` template helpers
 __allowed_functions__ = [
     # functions defined in ckan.lib.helpers
@@ -1836,6 +1889,8 @@ __allowed_functions__ = [
     'list_dict_filter',
     'new_activities',
     'time_ago_from_timestamp',
+    'get_organization',
+    'has_more_facets',
     # imported into ckan.lib.helpers
     'literal',
     'link_to',
