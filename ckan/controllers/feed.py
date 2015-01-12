@@ -33,7 +33,7 @@ import ckan.logic as logic
 from ckan.common import _, g, c, request, response, json
 
 # TODO make the item list configurable
-ITEMS_LIMIT = 20
+ITEMS_LIMIT = 1000
 
 log = logging.getLogger(__name__)
 
