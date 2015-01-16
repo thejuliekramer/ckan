@@ -72,7 +72,7 @@ def default_resource_schema():
         'package_id': [ignore],
         'url': [not_empty, unicode, remove_whitespace],
         'description': [ignore_missing, unicode],
-        'format': [not_empty, unicode],
+        'format': [ignore_missing, unicode],
         'hash': [ignore_missing, unicode],
         'state': [ignore],
         'position': [ignore],
