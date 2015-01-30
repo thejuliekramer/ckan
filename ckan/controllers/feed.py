@@ -347,7 +347,7 @@ class FeedController(BaseController):
                 title=pkg.get('title', ''),
                 link=self.base_url + h.url_for(controller='package',
                                                action='read',
-                                               id=pkg['id']),
+                                               id=pkg['name']),
                 description=pkg.get('notes', ''),
                 updated=h.date_str_to_datetime(pkg.get('metadata_modified')),
                 published=h.date_str_to_datetime(pkg.get('metadata_created')),
