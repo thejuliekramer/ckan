@@ -378,8 +378,13 @@ def group_dictize(group, context):
         if is_group_member:
             context['ignore_capacity_check'] = True
 
+    # Below code has been completely revamped in latest versions of CKAN.
+    # Especially after this commit https://github.com/ckan/ckan/commit/cdfefcfa5d292fabc44c0a0b0c77682a85a17084
+    # Processing 1000 datasets takes long time and defeats whole purpose of pagination.
+    # Changing returned rows to 20.
     if include_datasets:
-        q['rows'] = 1000    # Only the first 1000 datasets are returned
+        q['rows'] = 20
+        #q['rows'] = 1000    # Only the first 1000 datasets are returned
 
     context_ = dict((k, v) for (k, v) in context.items() if k != 'schema')
     search_results = logic.get_action('package_search')(context_, q)
