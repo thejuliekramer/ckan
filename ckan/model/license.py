@@ -58,6 +58,7 @@ class LicenseRegister(object):
                 LicenseCreativeCommonsAttributionShareAlike(),
                 LicenseGNUFreeDocument(),
                 LicenseOtherOpen(),
+                LicenseUSPublicDomain(),
                 LicenseOtherPublicDomain(),
                 LicenseOtherAttribution(),
                 LicenseOpenGovernment(),
@@ -254,6 +255,16 @@ class LicenseOtherOpen(DefaultLicense):
     @property
     def title(self):
         return _("Other (Open)")
+
+class LicenseUSPublicDomain(DefaultLicense):
+    domain_content = True
+    id = "us-pd"
+    is_okd_compliant = True
+    url = "http://www.usa.gov/publicdomain/label/1.0/"
+
+    @property
+    def title(self):
+        return _("U.S. Public Domain")
 
 class LicenseOtherPublicDomain(DefaultLicense):
     domain_content = True
