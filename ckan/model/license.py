@@ -264,7 +264,7 @@ class LicenseUSPublicDomain(DefaultLicense):
 
     @property
     def title(self):
-        return _("U.S. Public Domain")
+        return _("U.S. Government Work")
 
 class LicenseOtherPublicDomain(DefaultLicense):
     domain_content = True
