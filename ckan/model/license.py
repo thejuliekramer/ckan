@@ -58,6 +58,7 @@ class LicenseRegister(object):
                 LicenseCreativeCommonsAttributionShareAlike(),
                 LicenseGNUFreeDocument(),
                 LicenseOtherOpen(),
+                LicenseOtherSpecified(),
                 LicenseUSPublicDomain(),
                 LicenseOtherPublicDomain(),
                 LicenseOtherAttribution(),
@@ -255,6 +256,16 @@ class LicenseOtherOpen(DefaultLicense):
     @property
     def title(self):
         return _("Other (Open)")
+
+class LicenseOtherSpecified(DefaultLicense):
+    domain_content = True
+    id = "other-license-specified"
+    is_generic = True
+    is_okd_compliant = True
+
+    @property
+    def title(self):
+        return _("Other License Specified")
 
 class LicenseUSPublicDomain(DefaultLicense):
     domain_content = True
