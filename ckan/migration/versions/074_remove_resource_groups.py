@@ -20,9 +20,6 @@ def upgrade(migrate_engine):
         WHERE R.resource_group_id = G.id;
         ALTER TABLE "resource_revision" DROP COLUMN "resource_group_id";
 
-        ALTER TABLE resource_group_revision
-            DROP CONSTRAINT resource_group_revision_continuity_id_fkey;
-
         DROP TABLE "resource_group_revision";
         DROP TABLE "resource_group";
         '''
