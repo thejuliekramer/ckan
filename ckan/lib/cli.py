@@ -1155,6 +1155,7 @@ class Tracking(CkanCommand):
                 start_date = combine(start_date, datetime.time(0))
             else:
                 start_date = datetime.datetime(2011, 1, 1)
+                start_date = datetime.datetime(2013, 9, 1)
         start_date_solrsync = start_date
         end_date = datetime.datetime.now()
 
@@ -1237,6 +1238,30 @@ class Tracking(CkanCommand):
 
                  DROP TABLE tracking_tmp;
                  COMMIT;''' % summary_date
+        engine.execute(sql)
+
+        # insert a 0 count for all records with recent view,
+        # so that it will gets updated.
+        sql = '''WITH t2 AS  (
+                    SELECT package_id, max(tracking_date) AS max_date
+                    FROM tracking_summary
+                    GROUP BY package_id
+                    HAVING max(tracking_date) != '%s'
+                  ), t3 AS (
+                    SELECT t1.url, t1.package_id,t1.tracking_type
+                    FROM tracking_summary t1
+                    JOIN t2
+                    ON
+                      t1.package_id = t2.package_id
+                    AND
+                      t1.tracking_date = t2.max_date
+                    WHERE t1.recent_views > 0
+                  )
+                INSERT INTO tracking_summary
+                  (url, package_id, count, tracking_date, tracking_type)
+                SELECT url, package_id, 0, '%s', tracking_type
+                FROM t3;
+                COMMIT;''' % (summary_date, summary_date)
         engine.execute(sql)
 
         # get ids for dataset urls
