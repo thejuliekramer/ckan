@@ -598,6 +598,10 @@ def get_facet_items_dict(facet, limit=None, exclude_active=False):
     exclude_active -- only return unselected facets.
 
     '''
+
+    if (limit == None):
+       limit = int(config.get('search.facets.default'))
+
     if not c.search_facets or \
             not c.search_facets.get(facet) or \
             not c.search_facets.get(facet).get('items'):
@@ -639,8 +643,9 @@ def get_facet_items_dict(facet, limit=None, exclude_active=False):
                 facets.append(dict(active=True, **added_facet_item))
 
     facets = sorted(facets, key=lambda item: item['count'], reverse=True)
-    if c.search_facets_limits and limit is None:
-        limit = c.search_facets_limits.get(facet)
+    if c.search_facets_limits and limit is None and \
+            c.search_facets_limits.get(facet) == 0:
+        limit = 0
     # zero treated as infinite for hysterical raisins
     if limit is not None and limit > 0:
         return facets[:limit]
