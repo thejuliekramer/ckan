@@ -9,6 +9,8 @@ import ckan.model as model
 import ckan.new_authz as new_authz
 import ckan.lib.navl.dictization_functions as df
 import ckan.plugins as p
+from ckan.plugins import PluginImplementations
+from ckan.plugins.interfaces import IActions
 
 from ckan.common import _, c
 
