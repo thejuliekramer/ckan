@@ -396,7 +396,7 @@ def group_dictize(group, context,
                 q['fq'] = 'owner_org:"{0}"'.format(group_.id)
             else:
                 q['fq'] = 'groups:"{0}"'.format(group_.name)
-            q['fq'] += ' +-collection_package_id:["" TO *]'
+            q['fq'] += ' -collection_package_id:["" TO *]'
 
             # Allow members of organizations to see private datasets.
             if group_.is_organization:
