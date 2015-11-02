@@ -390,6 +390,9 @@ def unflatten(data):
     unflattened = {}
     convert_to_list = []
 
+    if data.get(('type',)) == 'harvest':
+        data.pop(('extras',), None)
+
     for flattend_key in sorted(data.keys(), key=flattened_order_key):
         current_pos = unflattened
 
