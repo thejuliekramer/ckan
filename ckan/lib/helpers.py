@@ -602,9 +602,9 @@ def get_facet_items_dict(facet, limit=None, exclude_active=False):
     if (limit == None):
        limit = int(config.get('search.facets.default'))
 
-    if not c.search_facets or \
-            not c.search_facets.get(facet) or \
-            not c.search_facets.get(facet).get('items'):
+    if not c.search_facets or not c.search_facets.get(facet):
+        return []
+    if not c.search_facets.get(facet).get('items'):
         # need a fake facet_item for metadata_type
         if facet != 'metadata_type':
             return []
