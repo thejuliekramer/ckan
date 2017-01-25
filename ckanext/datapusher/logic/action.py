@@ -264,7 +264,7 @@ def datapusher_status(context, data_dict):
     if job_id:
         url = urlparse.urljoin(datapusher_url, 'job' + '/' + job_id)
         try:
-            r = requests.get(url, headers={'Content-Type': 'application/json',
+            r = requests.get(url, headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'Authorization': job_key})
             r.raise_for_status()
             job_detail = r.json()
