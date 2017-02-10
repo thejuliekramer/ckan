@@ -1,7 +1,10 @@
+# encoding: utf-8
+
 import logging
 import json
 import urlparse
 import datetime
+import urllib2
 
 from dateutil.parser import parse as parse_date
 
@@ -212,12 +215,12 @@ def datapusher_hook(context, data_dict):
                     resubmit = True
             except ValueError:
                 pass
-        # Check if the URL of the file has been modified in the meantime
-        elif (resource_dict.get('url') and
-                metadata.get('original_url') and
-                resource_dict['url'] != metadata['original_url']):
-            log.debug('URLs are different: {0} != {1}'.format(
-                resource_dict['url'], metadata['original_url']))
+    # Check if the URL of the file has been modified in the meantime
+    elif resource_dict.get('url') and metadata.get('original_url'):
+        url1 = urllib2.unquote(resource_dict.get('url'))
+        url2 = urllib2.unquote(metadata['original_url'])
+        if url1 != url2:
+            log.debug('URLs are different: {0} != {1}'.format(url1, url2))
             resubmit = True
 
     context['ignore_auth'] = True
