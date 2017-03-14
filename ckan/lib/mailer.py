@@ -25,7 +25,7 @@ def add_msg_niceties(recipient_name, body, sender_name, sender_url):
     return _(u"Dear %s,") % recipient_name \
            + u"\r\n\r\n%s\r\n\r\n" % body
 
-def _mail_recipient(recipient_name, recipient_email,
+def _mail_recipient(recipient_name, recipient_emails=[''],
         sender_name, sender_url, subject,
         body, headers={}):
     mail_from = config.get('smtp.mail_from')
@@ -35,11 +35,14 @@ def _mail_recipient(recipient_name, recipient_email,
     subject = Header(subject.encode('utf-8'), 'utf-8')
     msg['Subject'] = subject
     msg['From'] = _("%s <%s>") % (sender_name, mail_from)
-    recipient = u"%s <%s>" % (recipient_name, recipient_email)
+    recipient = u"%s <%s>" % (recipient_name, recipient_emails[0])
     msg['To'] = Header(recipient, 'utf-8')
     msg['Date'] = Utils.formatdate(time())
     msg['X-Mailer'] = "CKAN %s" % ckan.__version__
+    _send_mail(mail_from, recipient_emails, msg)
 
+def _send_mail(mail_from='', recipient_emails=[''],
+        msg=MIMEText(''.encode('utf-8'), 'plain', 'utf-8')):
     # Send the email using Python's smtplib.
     smtp_connection = smtplib.SMTP()
     if 'smtp.test_server' in config:
@@ -78,8 +81,8 @@ def _mail_recipient(recipient_name, recipient_email,
                     "smtp.password must be configured as well.")
             smtp_connection.login(smtp_user, smtp_password)
 
-        smtp_connection.sendmail(mail_from, [recipient_email], msg.as_string())
-        log.info("Sent email to {0}".format(recipient_email))
+        smtp_connection.sendmail(mail_from, recipient_emails, msg.as_string())
+        log.info("Sent email to {0}".format(', '.join(recipient_emails)))
 
     except smtplib.SMTPException, e:
         msg = '%r' % e
@@ -90,7 +93,7 @@ def _mail_recipient(recipient_name, recipient_email,
 
 def mail_recipient(recipient_name, recipient_email, subject,
         body, headers={}):
-    return _mail_recipient(recipient_name, recipient_email,
+    return _mail_recipient(recipient_name, [recipient_email],
             '', '', subject, body, headers=headers)
 
 def mail_user(recipient, subject, body, headers={}):
