@@ -1911,7 +1911,8 @@ def resource_search(context, data_dict):
          .filter(model.Package.state == 'active') \
          .filter(model.Package.private == False) \
          .filter(model.Resource.state == 'active') \
-
+         .yield_per(1000).enable_eagerloads(False) \
+        
     resource_fields = model.Resource.get_columns()
     for field, terms in fields.items():
 
