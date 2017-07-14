@@ -223,6 +223,8 @@ class Repository(vdm.sqlalchemy.Repository):
                     celery_session.ResultModelBase.metadata.create_all(engine)
                 except ImportError:
                     pass
+                except:
+                    pass
 
                 self.init_configuration_data()
                 self.tables_created_and_initialised = True
