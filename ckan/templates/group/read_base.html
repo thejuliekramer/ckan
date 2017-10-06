@@ -17,6 +17,8 @@
   {{ h.build_nav_icon('group_read', _('Datasets'), id=c.group_dict.name) }}
   {{ h.build_nav_icon('group_activity', _('Activity Stream'), id=c.group_dict.name, offset=0) }}
   {{ h.build_nav_icon('group_about', _('About'), id=c.group_dict.name) }}
+  <li class="{% if request.path == '/group/' + c.group_dict.name + '/tag' %} active {% endif %}"><a href="/group/{{c.group_dict.name}}/tag"><i class="icon-tag"></i>Tag</a></li>
+  <li class="{% if request.path == '/group/' + c.group_dict.name + '/untag' %} active {% endif %}"><a href="/group/{{c.group_dict.name}}/untag"><i class="icon-remove"></i>Untag</a></li>
 {% endblock %}
 
 {% block secondary_content %}
