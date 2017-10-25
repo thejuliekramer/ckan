@@ -221,6 +221,9 @@ class Repository(vdm.sqlalchemy.Repository):
                     celery_session.ResultModelBase.metadata.create_all(engine)
                 except ImportError:
                     pass
+                except AttributeError:
+                    log.info('Avoiding Attribute error after adding celery app config to production.ini file')
+                    pass
 
                 self.init_configuration_data()
                 self.tables_created_and_initialised = True
