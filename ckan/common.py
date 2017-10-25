@@ -8,7 +8,6 @@
 
 
 from pylons.i18n import _, ungettext
-_ = lambda x: x
 from pylons import g, c, request, session, response
 import simplejson as json
 
