@@ -362,7 +362,6 @@ class BaseController(WSGIController):
             # Remove auth_tkt repoze.who cookie if user not logged in.
             elif cookie == 'auth_tkt' and not session.id:
                 response.delete_cookie(cookie)
-
         return res
 
     def __after__(self, action, **params):
