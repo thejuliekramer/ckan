@@ -45,11 +45,13 @@ class ApiController(base.BaseController):
         from urlparse import urlparse
 
         #ensure that value passed to datastore_root_url has a valid url scheme
-        parsed_url = urlparse(environ["QUERY_STRING"].split("datastore_root_url=")[1])
-        if not bool(parsed_url.scheme) or not bool(parsed_url.netloc):
-            resource_id = environ["QUERY_STRING"].split("datastore_root_url=")[0]
-            environ["QUERY_STRING"] = resource_id + "datastore_root_url=NOT A VALID URL FOR "
-
+        try:
+            parsed_url = urlparse(environ["QUERY_STRING"].split("datastore_root_url=")[1])
+            if not bool(parsed_url.scheme) or not bool(parsed_url.netloc):
+                resource_id = environ["QUERY_STRING"].split("datastore_root_url=")[0]
+                environ["QUERY_STRING"] = resource_id + "datastore_root_url=NOT A VALID URL FOR "
+        except:
+            pass
         # we need to intercept and fix the api version
         # as it will have a "/" at the start
         routes_dict = environ['pylons.routes_dict']
