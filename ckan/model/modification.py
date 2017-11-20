@@ -4,6 +4,7 @@ import ckan.plugins as plugins
 import domain_object
 import package as _package
 import resource
+from core import Revision as _revision
 
 log = logging.getLogger(__name__)
 
@@ -43,6 +44,16 @@ class DomainObjectModificationExtension(plugins.SingletonPlugin):
             return
 
         obj_cache = session._object_cache
+
+        contains_harvest_object = False
+        for set_iterate in obj_cache:
+            for obj in set_iterate:
+                if not isinstance(obj, (_package.Package, _revision)):
+                    contains_harvest_object = True
+
+        if not contains_harvest_object:
+            return
+
         new = obj_cache['new']
         changed = obj_cache['changed']
         deleted = obj_cache['deleted']
