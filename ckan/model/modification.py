@@ -4,7 +4,10 @@ import ckan.plugins as plugins
 import domain_object
 import package as _package
 import resource
-from core import Revision as _revision
+from package_extra import PackageExtra
+from core import Revision
+from group import Member
+from tag import PackageTag
 
 log = logging.getLogger(__name__)
 
@@ -45,13 +48,14 @@ class DomainObjectModificationExtension(plugins.SingletonPlugin):
 
         obj_cache = session._object_cache
 
-        contains_harvest_object = False
-        for set_iterate in obj_cache:
-            for obj in set_iterate:
-                if not isinstance(obj, (_package.Package, _revision)):
-                    contains_harvest_object = True
+        #send notification to celery queue only if obj_cache contains an object that does not belong to revision or package table, such as a harvest object
+        contains_other_object = False
+        for set_iterate, value in obj_cache.iteritems():
+            for obj in value:
+                if not isinstance(obj, (_package.Package, PackageTag, Revision, resource.Resource, PackageExtra, Member)):
+                    contains_other_object = True
 
-        if not contains_harvest_object:
+        if not contains_other_object:
             return
 
         new = obj_cache['new']
