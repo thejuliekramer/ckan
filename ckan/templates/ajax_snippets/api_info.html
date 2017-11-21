@@ -40,19 +40,19 @@ Example
             <tbody>
               <tr>
                 <th scope="row">{{ _('Create') }}</th>
-                <td><code>{{ datastore_root_url }}/datastore_create</code></td>
+                <td><code>{{ h.parse_datastore_root_url(datastore_root_url) }}/datastore_create</code></td>
               </tr>
               <tr>
                 <th scope="row">{{ _('Update / Insert') }}</th>
-                <td><code>{{ datastore_root_url }}/datastore_upsert</code></td>
+                <td><code>{{ h.parse_datastore_root_url(datastore_root_url) }}/datastore_upsert</code></td>
               </tr>
               <tr>
                 <th scope="row">{{ _('Query') }}</th>
-                <td><code>{{ datastore_root_url }}/datastore_search</code></td>
+                <td><code>{{ h.parse_datastore_root_url(datastore_root_url) }}/datastore_search</code></td>
               </tr>
               <tr>
                 <th scope="row">{{ _('Query (via SQL)') }}</th>
-                <td><code>{{ datastore_root_url }}/datastore_search_sql</code></td>
+                <td><code>{{ h.parse_datastore_root_url(datastore_root_url) }}/datastore_search_sql</code></td>
               </tr>
 
             </tbody>
@@ -69,19 +69,19 @@ Example
         <div class="accordion-inner">
           <strong>{{ _('Query example (first 5 results)') }}</strong>
           <p>
-          <code><a href="{{ datastore_root_url }}/datastore_search?resource_id={{resource_id}}&limit=5" target="_blank">{{ datastore_root_url }}/datastore_search?resource_id={{resource_id}}&limit=5</a></code>
+          <code><a href="{{ h.parse_datastore_root_url(datastore_root_url) }}/datastore_search?resource_id={{resource_id}}&limit=5" target="_blank">{{ h.parse_datastore_root_url(datastore_root_url) }}/datastore_search?resource_id={{resource_id}}&limit=5</a></code>
           </p>
 
           <strong>{{ _('Query example (results containing \'jones\')') }}</strong>
           <p>
-          <code><a href="{{ datastore_root_url }}/datastore_search?resource_id={{resource_id}}&q=jones"
-              target="_blank">{{ datastore_root_url }}/datastore_search?resource_id={{resource_id}}&q=jones</a></code>
+          <code><a href="{{ h.parse_datastore_root_url(datastore_root_url) }}/datastore_search?resource_id={{resource_id}}&q=jones"
+ +              target="_blank">{{ h.parse_datastore_root_url(datastore_root_url) }}/datastore_search?resource_id={{resource_id}}&q=jones</a></code>
           </p>
 
           <strong>{{ _('Query example (via SQL statement)') }}</strong>
           <p>
-          <code><a href="{{sql_example_url}}"
-              target="_blank">{{sql_example_url}}</a></code>
+          <code><a href="{{ h.parse_datastore_root_url(sql_example_url) }}"
+ +              target="_blank">{{h.parse_datastore_root_url(sql_example_url)}}</a></code>
           </p>
 
         </div>
