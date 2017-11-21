@@ -2125,7 +2125,7 @@ def license_options(existing_license_id=None):
 def parse_datastore_root_url(url):
     parsed_url = urlparse.urlparse(url)
     if not bool(parsed_url.scheme) or not bool(parsed_url.netloc):
-        return "NOT A VALID URL FOR "
+        return "NOT_A_VALID_URL_FOR "
     return url
 
 # these are the functions that will end up in `h` template helpers
