@@ -2028,6 +2028,12 @@ def get_organization(org=None, include_datasets=False):
     except (NotFound, ValidationError, NotAuthorized):
         return {}
 
+def parse_datastore_root_url(url):
+    parsed_url = urlparse.urlparse(url)
+    if not bool(parsed_url.scheme) or not bool(parsed_url.netloc):
+        return "NOT_A_VALID_URL_FOR_"
+    return url
+
 # these are the functions that will end up in `h` template helpers
 __allowed_functions__ = [
     # functions defined in ckan.lib.helpers
@@ -2145,4 +2151,5 @@ __allowed_functions__ = [
     'urlencode',
     'check_config_permission',
     'view_resource_url',
+    'parse_datastore_root_url',
 ]
