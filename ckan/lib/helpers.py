@@ -1586,6 +1586,16 @@ def get_pkg_dict_extra(pkg_dict, key, default=None):
                 finally:
                     if obj != None:
                         return extra['value']
+            elif key == 'harvest_source_id':
+                try:
+                    obj = p.toolkit.get_action('harvest_source_show')({}, {'id': extra['value']})
+                except p.toolkit.ObjectNotFound:
+                    obj = None
+                finally:
+                    if obj != None:
+                        return extra['value']
+            elif key == 'harvest_source_title':
+                default = extra['value']
             else:
                 return extra['value']
 
