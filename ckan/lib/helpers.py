@@ -1578,7 +1578,7 @@ def get_pkg_dict_extra(pkg_dict, key, default=None):
 
     for extra in extras:
         if extra['key'] == key:
-            return extra['value']
+            default = extra['value']
 
     return default
 
