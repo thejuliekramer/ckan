@@ -1573,21 +1573,12 @@ def get_pkg_dict_extra(pkg_dict, key, default=None):
     :key: extra key to lookup
     :default: default value returned if not found
     '''
-    from ckan import plugins as p
+
     extras = pkg_dict['extras'] if 'extras' in pkg_dict else []
 
     for extra in extras:
         if extra['key'] == key:
-            if key == 'harvest_object_id':
-                try:
-                    obj = p.toolkit.get_action('harvest_object_show')({}, {'id': extra['value']})
-                except p.toolkit.ObjectNotFound:
-                    obj = None
-                finally:
-                    if obj != None:
-                        return extra['value']
-            else:
-                return extra['value']
+            return extra['value']
 
     return default
 
