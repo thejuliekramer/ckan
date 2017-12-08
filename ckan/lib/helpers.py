@@ -1578,7 +1578,10 @@ def get_pkg_dict_extra(pkg_dict, key, default=None):
 
     for extra in extras:
         if extra['key'] == key:
-            return extra['value']
+            #This is a temporary fix, please change the following line to ---- return extra['value'] ----
+            # which will reduce the number of iterations. Update ckan-to-ckan harvesting, eliminating duplicate values,
+            # before making changes to this code.
+            default = extra['value']
 
     return default
 
