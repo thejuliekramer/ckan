@@ -18,6 +18,7 @@ import pprint
 import copy
 import urlparse
 from urllib import urlencode
+import uuid
 
 from paste.deploy.converters import asbool
 from webhelpers.html import escape, HTML, literal, url_escape
@@ -2128,6 +2129,12 @@ def parse_datastore_root_url(url):
         return "NOT_A_VALID_URL_FOR_"
     return url
 
+def sanitize_id(id_):
+    '''Given an id (uuid4), if it has any invalid characters it raises
+    ValueError.
+    '''
+    return str(uuid.UUID(id_))
+
 # these are the functions that will end up in `h` template helpers
 __allowed_functions__ = [
     # functions defined in ckan.lib.helpers
@@ -2248,4 +2255,5 @@ __allowed_functions__ = [
     'view_resource_url',
     'license_options',
     'parse_datastore_root_url',
+    'sanitize_id',
 ]
