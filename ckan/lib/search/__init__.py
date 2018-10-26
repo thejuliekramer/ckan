@@ -160,10 +160,19 @@ def rebuild(package_id=None, only_missing=False, force=False, refresh=False,
         package_index.insert_dict(pkg_dict)
     elif package_ids:
         for package_id in package_ids:
-            pkg_dict = logic.get_action('package_show')(context,
-                {'id': package_id})
-            log.info('Indexing just package %r...', pkg_dict['name'])
-            package_index.update_dict(pkg_dict, True)
+            try:
+                pkg_dict = logic.get_action('package_show')(context,
+                    {'id': package_id})
+                log.info('Indexing just package %r...', pkg_dict['name'])
+                package_index.update_dict(pkg_dict, True)
+            except Exception, e:
+                log.error('Error while indexing dataset %s: %s' %
+                          (package_id, str(e)))
+                if force:
+                    log.error(text_traceback())
+                    continue
+                else:
+                    raise
     else:
         package_ids = [r[0] for r in model.Session.query(model.Package.id).
                        filter(model.Package.state != 'deleted').all()]
