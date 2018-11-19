@@ -1457,7 +1457,7 @@ CKAN.Utils = function($, my) {
 /* == Data Previewer == */
 /* ==================== */
 CKAN.DataPreview = function ($, my) {
-  my.jsonpdataproxyUrl = 'http://jsonpdataproxy.appspot.com/';
+  my.jsonpdataproxyUrl = '//jsonpdataproxy.appspot.com/';
   my.dialogId = 'ckanext-datapreview';
   my.$dialog = $('#' + my.dialogId);
 

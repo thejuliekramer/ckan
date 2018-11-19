@@ -9,6 +9,8 @@ import ckan.model as model
 import ckan.new_authz as new_authz
 import ckan.lib.navl.dictization_functions as df
 import ckan.plugins as p
+from ckan.plugins import PluginImplementations
+from ckan.plugins.interfaces import IActions
 
 from ckan.common import _, c
 
@@ -421,7 +423,14 @@ def get_action(action):
                 context['__auth_audit'].append((action_name, id(_action)))
 
                 # check_access(action_name, context, data_dict=None)
+                # allow plugins to alter the data_dict/context before the action
+                for plugin in PluginImplementations(IActions):
+                    plugin.before_action(action_name, context, data_dict)
+                # call the action
                 result = _action(context, data_dict, **kw)
+                # allow plugins to alter the data_dict/context after the action
+                for plugin in PluginImplementations(IActions):
+                    plugin.after_action(action_name, context, data_dict)
                 try:
                     audit = context['__auth_audit'][-1]
                     if audit[0] == action_name and audit[1] == id(_action):

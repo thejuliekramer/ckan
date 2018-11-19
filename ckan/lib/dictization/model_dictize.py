@@ -345,6 +345,7 @@ def get_group_dataset_counts():
     query = search.PackageSearchQuery()
     q = {'q': '+capacity:public',
          'fl': 'groups', 'facet.field': ['groups', 'owner_org'],
+         'fq': '-collection_package_id:["" TO *]',
          'facet.limit': -1, 'rows': 1}
     query.run(q)
     return query.facets
@@ -395,6 +396,7 @@ def group_dictize(group, context,
                 q['fq'] = 'owner_org:"{0}"'.format(group_.id)
             else:
                 q['fq'] = 'groups:"{0}"'.format(group_.name)
+            q['fq'] += ' -collection_package_id:["" TO *]'
 
             # Allow members of organizations to see private datasets.
             if group_.is_organization:

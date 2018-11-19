@@ -1903,6 +1903,12 @@ def resource_search(context, data_dict):
     offset = data_dict.get('offset')
     limit = data_dict.get('limit')
 
+    #If not limit is specified, default limit is 10. If limit is greater than 1000, set limit to 1000
+    if limit > 1000:
+        limit = 1000
+    if limit == None:
+        limit = 10
+
     q = model.Session.query(model.Resource) \
          .join(model.Package) \
          .filter(model.Package.state == 'active') \

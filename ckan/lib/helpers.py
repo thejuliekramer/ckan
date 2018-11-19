@@ -16,6 +16,7 @@ import pprint
 import copy
 import urlparse
 from urllib import urlencode
+import uuid
 
 from paste.deploy.converters import asbool
 from webhelpers.html import escape, HTML, literal, url_escape
@@ -109,6 +110,24 @@ def url(*args, **kw):
     my_url = _pylons_default_url(*args, **kw)
     return _add_i18n_to_url(my_url, locale=locale, **kw)
 
+def get_site_protocol_and_host():
+    '''Return the protocol and host of the configured `ckan.site_url`.
+    This is needed to generate valid, full-qualified URLs.
+    If `ckan.site_url` is set like this::
+        ckan.site_url = http://example.com
+
+    Then this function would return a tuple `('http', 'example.com')`
+    If the setting is missing, `(None, None)` is returned instead.
+    '''
+    site_url = config.get('ckan.site_url', None)
+
+    if site_url is not None:
+        parsed_url = urlparse.urlparse(site_url)
+        return (
+            parsed_url.scheme.encode('utf-8'),
+            parsed_url.netloc.encode('utf-8')
+        )
+    return (None, None)
 
 def get_site_protocol_and_host():
     '''Return the protocol and host of the configured `ckan.site_url`.
@@ -626,10 +645,16 @@ def get_facet_items_dict(facet, limit=None, exclude_active=False):
     exclude_active -- only return unselected facets.
 
     '''
-    if not c.search_facets or \
-            not c.search_facets.get(facet) or \
-            not c.search_facets.get(facet).get('items'):
+
+    if (limit == None):
+       limit = int(config.get('search.facets.default'))
+
+    if not c.search_facets or not c.search_facets.get(facet):
         return []
+    if not c.search_facets.get(facet).get('items'):
+        # need a fake facet_item for metadata_type
+        if facet != 'metadata_type':
+            return []
     facets = []
     for facet_item in c.search_facets.get(facet)['items']:
         if not len(facet_item['name'].strip()):
@@ -638,9 +663,36 @@ def get_facet_items_dict(facet, limit=None, exclude_active=False):
             facets.append(dict(active=False, **facet_item))
         elif not exclude_active:
             facets.append(dict(active=True, **facet_item))
+        # need a fake facet_item for metadata_type
+        if facet == 'metadata_type' and facet_item['name'] == 'geospatial':
+            added_facet_item = {
+                'name': u'non-geospatial',
+                'display_name': u'non-geospatial',
+                'count': c.page.item_count - facet_item['count']
+            }
+            if added_facet_item['count'] == 0:
+                continue
+            if not (facet, added_facet_item['name']) in request.params.items():
+                facets.append(dict(active=False, **added_facet_item))
+            elif not exclude_active:
+                facets.append(dict(active=True, **added_facet_item))
+    # need a fake facet_item for metadata_type
+    if facet == 'metadata_type' and facets == []:
+        added_facet_item = {
+            'name': u'non-geospatial',
+            'display_name': u'non-geospatial',
+            'count': c.page.item_count
+        }
+        if added_facet_item['count'] != 0:
+            if not (facet, added_facet_item['name']) in request.params.items():
+                facets.append(dict(active=False, **added_facet_item))
+            elif not exclude_active:
+                facets.append(dict(active=True, **added_facet_item))
+
     facets = sorted(facets, key=lambda item: item['count'], reverse=True)
-    if c.search_facets_limits and limit is None:
-        limit = c.search_facets_limits.get(facet)
+    if c.search_facets_limits and limit is None and \
+            c.search_facets_limits.get(facet) == 0:
+        limit = 0
     # zero treated as infinite for hysterical raisins
     if limit is not None and limit > 0:
         return facets[:limit]
@@ -755,7 +807,7 @@ def sorted_extras(package_extras, auto_clean=False, subs=None, exclude=None):
         if extra.get('state') == 'deleted':
             continue
         k, v = extra['key'], extra['value']
-        if k in exclude:
+        if k in exclude or k.startswith('__'):
             continue
         if subs and k in subs:
             k = subs[k]
@@ -1573,7 +1625,10 @@ def get_pkg_dict_extra(pkg_dict, key, default=None):
 
     for extra in extras:
         if extra['key'] == key:
-            return extra['value']
+            #This is a temporary fix, please change the following line to ---- return extra['value'] ----
+            # which will reduce the number of iterations. Update ckan-to-ckan harvesting, eliminating duplicate values,
+            # before making changes to this code.
+            default = extra['value']
 
     return default
 
@@ -2039,6 +2094,13 @@ def license_options(existing_license_id=None):
         for license_id in license_ids]
 
 
+def sanitize_id(id_):
+    '''Given an id (uuid4), if it has any invalid characters it raises
+    ValueError.
+    '''
+    return str(uuid.UUID(id_))
+
+
 # these are the functions that will end up in `h` template helpers
 __allowed_functions__ = [
     # functions defined in ckan.lib.helpers
@@ -2157,4 +2219,5 @@ __allowed_functions__ = [
     'check_config_permission',
     'view_resource_url',
     'license_options',
+    'sanitize_id'
 ]

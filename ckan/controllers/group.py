@@ -262,6 +262,7 @@ class GroupController(base.BaseController):
 
         try:
             c.fields = []
+            c.fields_grouped = {}
             search_extras = {}
             for (param, value) in request.params.items():
                 if not param in ['q', 'page', 'sort'] \
@@ -269,6 +270,10 @@ class GroupController(base.BaseController):
                     if not param.startswith('ext_'):
                         c.fields.append((param, value))
                         q += ' %s: "%s"' % (param, value)
+                        if param not in c.fields_grouped:
+                            c.fields_grouped[param] = [value]
+                        else:
+                            c.fields_grouped[param].append(value)
                     else:
                         search_extras[param] = value
 
@@ -385,6 +390,11 @@ class GroupController(base.BaseController):
             abort(404, _('Group not found'))
         except NotAuthorized:
             abort(401, _('Unauthorized to read group %s') % id)
+
+        try:
+            self._check_access('group_update', context)
+        except NotAuthorized, e:
+            abort(401, _('User %r not authorized to edit %s') % (c.user, id))
 
         #use different form names so that ie7 can be detected
         form_names = set(["bulk_action.public", "bulk_action.delete",
@@ -633,6 +643,12 @@ class GroupController(base.BaseController):
             abort(401, _('Unauthorized to delete group %s') % '')
         except NotFound:
             abort(404, _('Group not found'))
+
+        try:
+            self._check_access('group_update', context)
+        except NotAuthorized, e:
+            abort(401, _('User %r not authorized to edit %s') % (c.user, id))
+
         return self._render_template('group/members.html')
 
     def member_new(self, id):

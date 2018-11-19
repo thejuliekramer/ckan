@@ -33,7 +33,7 @@ import ckan.logic as logic
 from ckan.common import _, g, c, request, response, json
 
 # TODO make the item list configurable
-ITEMS_LIMIT = 20
+ITEMS_LIMIT = 1000
 
 log = logging.getLogger(__name__)
 
@@ -377,7 +377,7 @@ class FeedController(base.BaseController):
                 title=pkg.get('title', ''),
                 link=self.base_url + h.url_for(controller='package',
                                                action='read',
-                                               id=pkg['id']),
+                                               id=pkg['name']),
                 description=pkg.get('notes', ''),
                 updated=h.date_str_to_datetime(pkg.get('metadata_modified')),
                 published=h.date_str_to_datetime(pkg.get('metadata_created')),

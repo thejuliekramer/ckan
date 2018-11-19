@@ -245,6 +245,42 @@ class ResourceSearchQuery(SearchQuery):
 
 
 class PackageSearchQuery(SearchQuery):
+    def get_count(self):
+        """
+        Return the count of all indexed packages.
+        """
+        query = "*:*"
+        fq = "+site_id:\"%s\" " % config.get('ckan.site_id')
+        fq += "+state:active "
+
+        conn = make_connection()
+        try:
+            data = conn.query(query, fq=fq, rows=0)
+        finally:
+            conn.close()
+
+        return data.numFound
+
+    def get_paginated_entity_name_modtime(self, max_results=1000, start=0):
+        """
+        Return a list of the name and metadata_modified s of indexed packages.
+        """
+        query = "*:*"
+        fq = "+site_id:\"%s\" " % config.get('ckan.site_id')
+        fq += "+state:active "
+
+        conn = make_connection()
+        try:
+            data = conn.query(query, fq=fq, rows=max_results,
+                    fields='name,metadata_modified', start=start)
+        finally:
+            conn.close()
+
+        return [{'name':r.get('name'),
+                 'metadata_modified': r.get('metadata_modified')} \
+                 for r in data.results]
+
+
     def get_all_entity_ids(self, max_results=1000):
         """
         Return a list of the IDs of all indexed packages.
@@ -309,6 +345,9 @@ class PackageSearchQuery(SearchQuery):
         q = query.get('q')
         if not q or q == '""' or q == "''":
             query['q'] = "*:*"
+        else:
+            # need a fake facet_item for metadata_type
+            query['q'] = q.replace('metadata_type: "non-geospatial"', '-metadata_type: "geospatial"')
 
         # number of results
         rows_to_return = min(1000, int(query.get('rows', 10)))
@@ -321,7 +360,15 @@ class PackageSearchQuery(SearchQuery):
         query['rows'] = rows_to_query
 
         # show only results from this CKAN instance
+        # order by score if no 'sort' term given
+        order_by = query.get('sort')
+        if order_by == 'rank' or order_by is None:
+            query['sort'] = 'score desc, name asc'
+
         fq = query.get('fq', '')
+        # need a fake facet_item for metadata_type
+        fq = fq.replace('metadata_type:"non-geospatial"', '-metadata_type:"geospatial"')
+        # show only results from this CKAN instance
         if not '+site_id:' in fq:
             fq += ' +site_id:"%s"' % config.get('ckan.site_id')
 

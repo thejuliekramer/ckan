@@ -245,6 +245,12 @@ class PackageSearchIndex(SearchIndex):
             if k in pkg_dict and pkg_dict[k]:
                 pkg_dict[k] = escape_xml_illegal_chars(pkg_dict[k])
 
+        if pkg_dict.get('res_description'):
+            pkg_dict['res_description'] = [
+                escape_xml_illegal_chars(item) \
+                        for item in pkg_dict['res_description']
+            ]
+
         # modify dates (SOLR is quite picky with dates, and only accepts ISO dates
         # with UTC time (i.e trailing Z)
         # See http://lucene.apache.org/solr/api/org/apache/solr/schema/DateField.html

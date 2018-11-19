@@ -834,7 +834,7 @@ def filter_fields_and_values_exist_and_are_valid(key, data, errors, context):
 def extra_key_not_in_root_schema(key, data, errors, context):
 
     for schema_key in context.get('schema_keys', []):
-        if schema_key == data[key]:
+        if schema_key == data[key] and schema_key not in ['tags']:
             raise Invalid(_('There is a schema field with the same name'))
 
 

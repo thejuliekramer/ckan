@@ -28,10 +28,10 @@ class ErrorController(BaseController):
         # from a page. #1176
         if not original_response:
             return 'There is no error.'
-        # Bypass error template for API operations.
+        # Bypass error template for API operations and fanstatic.
         if (original_request and
-                (original_request.path.startswith('/api') or
-                 original_request.path.startswith('/fanstatic'))):
+                (original_request.path.startswith('/api/') or
+                 '/fanstatic/' in original_request.path)):
             return original_response.body
         # Otherwise, decorate original response with error template.
         c.content = literal(original_response.unicode_body) or \

@@ -4,6 +4,10 @@ import ckan.plugins as plugins
 import domain_object
 import package as _package
 import resource
+from package_extra import PackageExtra
+from core import Revision
+from group import Member
+from tag import PackageTag
 
 log = logging.getLogger(__name__)
 
@@ -43,19 +47,27 @@ class DomainObjectModificationExtension(plugins.SingletonPlugin):
             return
 
         obj_cache = session._object_cache
+
+        #send notification to celery queue only if obj_cache contains an object that does not belong to revision or package table, such as a harvest object
+        contains_other_object = False
+        for set_iterate, value in obj_cache.iteritems():
+            for obj in value:
+                if not isinstance(obj, (_package.Package, PackageTag, Revision, resource.Resource, PackageExtra, Member)):
+                    contains_other_object = True
+
         new = obj_cache['new']
         changed = obj_cache['changed']
         deleted = obj_cache['deleted']
 
         for obj in set(new):
             if isinstance(obj, (_package.Package, resource.Resource)):
-                method(obj, domain_object.DomainObjectOperation.new)
+                method(obj, domain_object.DomainObjectOperation.new, contains_other_object)
         for obj in set(deleted):
             if isinstance(obj, (_package.Package, resource.Resource)):
-                method(obj, domain_object.DomainObjectOperation.deleted)
+                method(obj, domain_object.DomainObjectOperation.deleted, contains_other_object)
         for obj in set(changed):
             if isinstance(obj, resource.Resource):
-                method(obj, domain_object.DomainObjectOperation.changed)
+                method(obj, domain_object.DomainObjectOperation.changed, contains_other_object)
             if getattr(obj, 'url_changed', False):
                 for item in plugins.PluginImplementations(plugins.IResourceUrlChange):
                     item.notify(obj)
@@ -74,14 +86,17 @@ class DomainObjectModificationExtension(plugins.SingletonPlugin):
                     if package and package not in deleted | new:
                         changed_pkgs.add(package)
         for obj in changed_pkgs:
-            method(obj, domain_object.DomainObjectOperation.changed)
+            method(obj, domain_object.DomainObjectOperation.changed, contains_other_object)
 
 
-    def notify(self, entity, operation):
+    def notify(self, entity, operation, allow_archiver=True):
         for observer in plugins.PluginImplementations(
                 plugins.IDomainObjectModification):
             try:
-                observer.notify(entity, operation)
+                if repr(observer) == "<Plugin ArchiverPlugin 'archiver'>" and not allow_archiver:
+                    return
+                else:
+                    observer.notify(entity, operation)
             except Exception, ex:
                 log.exception(ex)
                 # We reraise all exceptions so they are obvious there
