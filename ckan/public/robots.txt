@@ -3,7 +3,5 @@ Disallow: /dataset/rate/
 Disallow: /revision/
 Disallow: /dataset/*/history
 Disallow: /api/
-
-User-Agent: *
-Crawl-Delay: 10
-
+Sitemap: https://filestore.data.gov/gsa/catalog/sitemap/sitemap.xml
+Crawl-delay: 10
