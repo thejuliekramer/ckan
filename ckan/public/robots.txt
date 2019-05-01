@@ -2,6 +2,10 @@ User-agent: *
 Disallow: /dataset/rate/
 Disallow: /revision/
 Disallow: /dataset/*/history
+Disallow: /dataset?
+Disallow: /organization?
+Disallow: /harvest?
+Disallow: /group?
 Disallow: /api/
 Sitemap: https://filestore.data.gov/gsa/catalog/sitemap/sitemap.xml
 Crawl-delay: 10
