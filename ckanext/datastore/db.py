@@ -1212,7 +1212,7 @@ def search(context, data_dict):
 def search_sql(context, data_dict):
     engine = _get_engine(data_dict)
     context['connection'] = engine.connect()
-    timeout = context.get('query_timeout', _TIMEOUT)
+    timeout = context.get('query_timeout', 10000)
     _cache_types(context)
 
     sql = data_dict['sql'].replace('%', '%%')
