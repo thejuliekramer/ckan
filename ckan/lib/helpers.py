@@ -18,6 +18,7 @@ import pprint
 import copy
 import urlparse
 from urllib import urlencode
+import uuid
 
 from paste.deploy.converters import asbool
 from webhelpers.html import escape, HTML, literal, url_escape
@@ -139,6 +140,24 @@ def url(*args, **kw):
     my_url = _pylons_default_url(*args, **kw)
     return _add_i18n_to_url(my_url, locale=locale, **kw)
 
+def get_site_protocol_and_host():
+    '''Return the protocol and host of the configured `ckan.site_url`.
+    This is needed to generate valid, full-qualified URLs.
+    If `ckan.site_url` is set like this::
+        ckan.site_url = http://example.com
+
+    Then this function would return a tuple `('http', 'example.com')`
+    If the setting is missing, `(None, None)` is returned instead.
+    '''
+    site_url = config.get('ckan.site_url', None)
+
+    if site_url is not None:
+        parsed_url = urlparse.urlparse(site_url)
+        return (
+            parsed_url.scheme.encode('utf-8'),
+            parsed_url.netloc.encode('utf-8')
+        )
+    return (None, None)
 
 def get_site_protocol_and_host():
     '''Return the protocol and host of the configured `ckan.site_url`.
@@ -2128,6 +2147,12 @@ def parse_datastore_root_url(url):
         return "NOT_A_VALID_URL_FOR_"
     return url
 
+def sanitize_id(id_):
+    '''Given an id (uuid4), if it has any invalid characters it raises
+    ValueError.
+    '''
+    return str(uuid.UUID(id_))
+
 # these are the functions that will end up in `h` template helpers
 __allowed_functions__ = [
     # functions defined in ckan.lib.helpers
@@ -2248,4 +2273,5 @@ __allowed_functions__ = [
     'view_resource_url',
     'license_options',
     'parse_datastore_root_url',
+    'sanitize_id',
 ]
