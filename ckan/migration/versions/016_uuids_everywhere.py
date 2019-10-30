@@ -106,7 +106,7 @@ def drop_constraints_and_alter_types(primary_table_name, foreign_tables, revisio
                     #print 'CON', dropped_fk_constraints[-1]
 
     # 2 alter type of primary table id and foreign keys
-                    id_col = constraint.table.columns[constraint.columns[0]]
+                    id_col = constraint.table.columns[constraint.columns.keys()[0]]
                     id_col.alter(type=UnicodeText)
 
     primary_table = Table(primary_table_name, metadata, autoload=True)
@@ -137,7 +137,7 @@ def add_fk_constraints(migrate_engine, dropped_fk_constraints, primary_table_nam
             FOREIGN KEY (%(col_name)s)
             REFERENCES %(primary_table_name)s (id)
             ''' % {'table':table_name, 'fkeyname':constraint_name,
-                   'col_name':constraint_columns[0],
+                   'col_name':constraint_columns.keys()[0],
                    'primary_table_name':primary_table_name}
         migrate_engine.execute(oursql)
 
