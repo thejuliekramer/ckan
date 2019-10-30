@@ -38,8 +38,8 @@ def drop_constraints_and_alter_types():
                     orig_fk.drop()
                     dropped_fk_constraints.append((constraint.columns, foreign_key_cols, constraint.name, table.name))
 
-    # 2 alter type of revision id and foreign keys
-                    id_col = constraint.table.columns[constraint.columns[0]]
+                    # 2 alter type of revision id and foreign keys
+                    id_col = constraint.table.columns[constraint.columns.keys()[0]]
                     id_col.alter(type=UnicodeText)
 
     revision_table = Table('revision', metadata, autoload=True)
@@ -68,7 +68,7 @@ def upgrade2(migrate_engine, dropped_fk_constraints):
             FOREIGN KEY (%(col_name)s)
             REFERENCES revision (id)
             ''' % {'table':table_name, 'fkeyname':constraint_name,
-                    'col_name':constraint_columns[0] }
+                    'col_name':constraint_columns.keys()[0]}
         migrate_engine.execute(oursql)
 
     # 4 create uuids for revisions and in related tables
