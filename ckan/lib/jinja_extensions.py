@@ -32,11 +32,11 @@ def truncate(value, length=255, killwords=None, end='...'):
     if value is None:
         return None
     if killwords is not None:
-        return do_truncate(value, length=length, killwords=killwords, end=end)
-    result = do_truncate(value, length=length, killwords=False, end=end)
+        return do_truncate(Environment(), value, length=length, killwords=killwords, end=end)
+    result = do_truncate(Environment(), value, length=length, killwords=False, end=end)
     if result != end:
         return result
-    return do_truncate(value, length=length, killwords=True, end=end)
+    return do_truncate(Environment(), value, length=length, killwords=True, end=end)
 
 ### Tags
 
@@ -62,7 +62,10 @@ class CkanInternationalizationExtension(ext.InternationalizationExtension):
 
     def parse(self, parser):
         node = ext.InternationalizationExtension.parse(self, parser)
-        args = getattr(node.nodes[0], 'args', None)
+        if isinstance(node, list):
+            args = getattr(node[1].nodes[0], 'args', None)
+        else:
+            args = getattr(node.nodes[0], 'args', None)
         if args:
             for arg in args:
                 if isinstance(arg, nodes.Const):
@@ -70,7 +73,6 @@ class CkanInternationalizationExtension(ext.InternationalizationExtension):
                     if isinstance(value, unicode):
                         arg.value = regularise_html(value)
         return node
-
 
 class CkanExtend(ext.Extension):
     ''' Custom {% ckan_extends <template> %} tag that allows templates
