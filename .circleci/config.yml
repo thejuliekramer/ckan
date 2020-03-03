@@ -13,7 +13,7 @@ jobs:
           command: pwd && ls -la
       - run:
           name: install
-          command: bin/circleci-build
+          command: sh ./bin/circleci-install-dependencies.sh
       - run:
           name: test
           command: bin/travis-run-tests

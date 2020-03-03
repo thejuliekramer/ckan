@@ -1,8 +1,8 @@
 CKAN: The Open Source Data Portal Software
 ==========================================
 
-.. image:: https://circleci.com/gh/thejuliekramer/ckan/tree/update_pysaml2.svg?style=svg
-    :target: https://circleci.com/gh/thejuliekramer/ckan/tree/update_pysaml2
+.. image:: https://circleci.com/gh/thejuliekramer/ckan/tree/add_circle_ci_datagov.svg?style=svg
+    :target: https://circleci.com/gh/thejuliekramer/ckan/tree/add_circle_ci_datagov
 
 **CKAN is the world’s leading open-source data portal platform**.
 CKAN makes it easy to publish, share and work with data. It's a data management
