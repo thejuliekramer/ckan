@@ -1,0 +1,25 @@
+version: 2
+jobs:  
+  build_datagov:
+    working_directory: ~/ckan
+    machine:
+      image: circleci/classic:201708-01
+    environment:
+      CKANVERSION=inventory
+    steps:
+      - checkout
+      - run:
+          name: where am I
+          command: pwd && ls -la
+      - run:
+          name: install
+          command: bin/circleci-build
+      - run:
+          name: test
+          command: bin/travis-run-tests
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build_datagov
