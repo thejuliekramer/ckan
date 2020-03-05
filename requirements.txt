@@ -36,7 +36,6 @@ psycopg2==2.4.5
 Pygments==2.0.2
 Pylons==0.9.7
 pyrsistent==0.15.4
--e git+https://github.com/GSA/pysaml2.git@8b605c824ff1d042e9040a9971c28f369197cac2#egg=pysaml2
 python-dateutil==1.5
 python-memcached==1.48
 pytz==2012j
