@@ -36,7 +36,7 @@ psycopg2==2.4.5
 Pygments==2.0.2
 Pylons==0.9.7
 pyrsistent==0.15.4
-pysaml2==5.0.0
+pysaml2==1.0.2
 python-dateutil==1.5
 python-memcached==1.48
 pytz==2012j
